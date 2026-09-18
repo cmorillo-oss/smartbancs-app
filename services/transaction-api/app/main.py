@@ -1,13 +1,16 @@
 """Punto de entrada de transaction-api (Fases 1-2: salud + observabilidad)."""
 from contextlib import asynccontextmanager
 
-from fastapi import FastAPI, Response
+from fastapi import FastAPI, Request, Response
+from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
 from prometheus_client import CONTENT_TYPE_LATEST, generate_latest
 from sqlalchemy import text
 
+from app.api.routes import router
 from app.database import engine
-from app.observability.logging import configure_logging, get_logger
+from app.errors import DomainError
+from app.observability.logging import configure_logging, get_logger, trace_id_var
 from app.observability.metrics import register_pool_gauge, register_query_timing
 from app.observability.middleware import TraceMiddleware
 from app.observability.tracing import setup_tracing
@@ -27,7 +30,7 @@ async def lifespan(_: FastAPI):
     await engine.dispose()
 
 
-app = FastAPI(title="SmartBancs Transaction API", version="0.2.0", lifespan=lifespan)
+app = FastAPI(title="SmartBancs Transaction API", version="0.3.0", lifespan=lifespan)
 
 # Orden importa: Starlette pone el ÚLTIMO middleware añadido como el más externo. Registramos
 # TraceMiddleware primero y la instrumentación OTel después, para que OTel quede por fuera:
@@ -36,6 +39,27 @@ app.add_middleware(TraceMiddleware)
 setup_tracing(app, engine)
 register_pool_gauge(engine)
 register_query_timing(engine)
+app.include_router(router)
+
+
+@app.exception_handler(DomainError)
+async def domain_error_handler(_: Request, exc: DomainError):
+    """Formato de error uniforme: error_code estable + trace_id para que soporte localice el caso."""
+    log.warning("domain_error", error_code=exc.error_code, message=exc.message)
+    return JSONResponse(
+        status_code=exc.status_code,
+        content={"error_code": exc.error_code, "message": exc.message, "trace_id": trace_id_var.get()},
+    )
+
+
+@app.exception_handler(RequestValidationError)
+async def validation_error_handler(_: Request, exc: RequestValidationError):
+    # jsonable_encoder no hace falta: pasamos solo campos simples (ubicación y mensaje).
+    details = [{"field": ".".join(str(p) for p in e["loc"]), "message": e["msg"]} for e in exc.errors()]
+    return JSONResponse(
+        status_code=422,
+        content={"error_code": "VALIDATION_ERROR", "details": details, "trace_id": trace_id_var.get()},
+    )
 
 
 @app.get("/health")

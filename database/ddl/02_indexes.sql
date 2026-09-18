@@ -15,6 +15,11 @@ CREATE INDEX idx_outbox_status_retry ON outbox_events (status, next_retry_at);
 -- El orden DESC en el índice evita un sort en memoria.
 CREATE INDEX idx_tx_source_created ON transactions (source_account_id, created_at DESC);
 
+-- Historial de una cuenta como DESTINO: GET /accounts/{n}/transactions muestra lo enviado Y lo
+-- recibido (WHERE source = :id OR dest = :id). Sin este índice, la mitad "recibido" haría
+-- un barrido completo de la tabla. Añadido en la Fase 3 al implementar ese endpoint.
+CREATE INDEX idx_tx_dest_created ON transactions (dest_account_id, created_at DESC);
+
 -- Conteos y búsquedas por estado (p.ej. transacciones PENDING/FAILED en diagnóstico y reconciliación).
 CREATE INDEX idx_tx_status ON transactions (status);
 

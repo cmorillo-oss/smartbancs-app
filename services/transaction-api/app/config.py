@@ -25,6 +25,21 @@ class Settings(BaseSettings):
     db_pool_timeout: int = 5      # segundos esperando una conexión antes de fallar rápido
                                   # (fallar rápido > colgar al cliente indefinidamente)
 
+    # --- Control de concurrencia (Fase 3) ---
+    # Tiempo máximo esperando un bloqueo de fila. POR QUÉ 3s: por debajo del SLO de 2s para el
+    # cliente sería inútil (fallaría casi siempre en picos); mucho más largo retendría una
+    # conexión del pool del que dependen todas las demás peticiones. Falla rápido, no cuelga el pool.
+    db_lock_timeout_ms: int = 3000
+    # Reintentos ante deadlock (40P01). Con el orden determinista no deberían ocurrir; es red de seguridad.
+    deadlock_max_retries: int = 3
+    deadlock_backoff_base_ms: int = 50
+    # Divisas aceptadas, separadas por coma.
+    supported_currencies: str = "USD,EUR,COP"
+
+    @property
+    def currencies(self) -> set[str]:
+        return {c.strip().upper() for c in self.supported_currencies.split(",") if c.strip()}
+
     # --- Trazas (OpenTelemetry) ---
     # Vacío = los spans se generan (y dan span_id a los logs) pero NO se exportan.
     # POR QUÉ: así la API arranca sin depender de un colector; exportar es opt-in y un
