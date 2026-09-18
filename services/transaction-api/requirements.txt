@@ -1,8 +1,20 @@
-# Fase 1: solo lo estrictamente necesario. Las librerías de observabilidad
-# (structlog, prometheus-client, opentelemetry) se añaden en la Fase 2.
 fastapi==0.115.6
 uvicorn[standard]==0.34.0
 SQLAlchemy[asyncio]==2.0.36
 asyncpg==0.30.0
 pydantic==2.10.4
 pydantic-settings==2.7.0
+
+# --- Fase 2: observabilidad ---
+structlog==24.4.0
+prometheus-client==0.21.1
+# Las versiones de OpenTelemetry van SINCRONIZADAS: el API/SDK (1.29.0) y las
+# instrumentaciones (0.50b0) se publican juntos; mezclar versiones rompe en tiempo de ejecución.
+opentelemetry-api==1.29.0
+opentelemetry-sdk==1.29.0
+opentelemetry-exporter-otlp-proto-http==1.29.0
+opentelemetry-instrumentation-fastapi==0.50b0
+opentelemetry-instrumentation-sqlalchemy==0.50b0
+opentelemetry-instrumentation-httpx==0.50b0
+# httpx: lo usará el cliente de IA (Fase 5); se instala ya para que su auto-instrumentación exista.
+httpx==0.28.1

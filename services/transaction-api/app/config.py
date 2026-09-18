@@ -12,6 +12,7 @@ class Settings(BaseSettings):
     model_config = SettingsConfigDict(extra="ignore")
 
     service_name: str = "transaction-api"
+    log_level: str = "INFO"
 
     # Cadena de conexión con driver asyncpg (necesario para SQLAlchemy async).
     database_url: str = "postgresql+asyncpg://smartbancs:smartbancs@postgres:5432/smartbancs"
@@ -23,6 +24,12 @@ class Settings(BaseSettings):
     db_max_overflow: int = 10     # conexiones extra temporales en picos
     db_pool_timeout: int = 5      # segundos esperando una conexión antes de fallar rápido
                                   # (fallar rápido > colgar al cliente indefinidamente)
+
+    # --- Trazas (OpenTelemetry) ---
+    # Vacío = los spans se generan (y dan span_id a los logs) pero NO se exportan.
+    # POR QUÉ: así la API arranca sin depender de un colector; exportar es opt-in y un
+    # colector caído nunca debe tumbar ni ralentizar la API.
+    otel_exporter_otlp_endpoint: str = ""
 
 
 settings = Settings()

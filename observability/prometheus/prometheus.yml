@@ -1,0 +1,11 @@
+global:
+  # 5s: suficientemente fino para ver un pico de quincena; más bajo solo añade carga sin información.
+  scrape_interval: 5s
+  evaluation_interval: 5s
+
+scrape_configs:
+  - job_name: transaction-api
+    metrics_path: /metrics
+    static_configs:
+      # Nombre del servicio en la red de Docker Compose (DNS interno), no localhost.
+      - targets: ["transaction-api:8000"]
