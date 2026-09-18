@@ -1,0 +1,43 @@
+services:
+  postgres:
+    image: postgres:16
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-smartbancs}
+      POSTGRES_USER: ${POSTGRES_USER:-smartbancs}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-smartbancs}
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
+    volumes:
+      # POR QUÉ montar los .sql aquí: la imagen oficial ejecuta en orden alfabético todo lo
+      # que haya en este directorio, SOLO la primera vez (volumen vacío). Así el esquema y
+      # el seed se crean solos con `docker compose up`, sin pasos manuales.
+      # POR QUÉ un montaje por archivo: el entrypoint NO recorre subdirectorios, así que
+      # montar las carpetas ddl/ y dml/ enteras dejaría los scripts sin ejecutar (error real
+      # que encontramos al verificar). El prefijo numérico (01,02,03) fija el orden.
+      - ./database/ddl/01_schema.sql:/docker-entrypoint-initdb.d/01_schema.sql:ro
+      - ./database/ddl/02_indexes.sql:/docker-entrypoint-initdb.d/02_indexes.sql:ro
+      - ./database/dml/03_seed.sql:/docker-entrypoint-initdb.d/03_seed.sql:ro
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      # POR QUÉ healthcheck: sin él, depends_on solo espera a que el contenedor ARRANQUE,
+      # no a que Postgres acepte conexiones, y la API fallaría en su primer intento.
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-smartbancs} -d ${POSTGRES_DB:-smartbancs}"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  transaction-api:
+    build: ./services/transaction-api
+    environment:
+      DATABASE_URL: ${DATABASE_URL:-postgresql+asyncpg://smartbancs:smartbancs@postgres:5432/smartbancs}
+      DB_POOL_SIZE: ${DB_POOL_SIZE:-20}
+      DB_MAX_OVERFLOW: ${DB_MAX_OVERFLOW:-10}
+      DB_POOL_TIMEOUT: ${DB_POOL_TIMEOUT:-5}
+    ports:
+      - "${API_PORT:-8000}:8000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+volumes:
+  pgdata:

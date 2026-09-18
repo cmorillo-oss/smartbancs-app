@@ -1,0 +1,14 @@
+.env
+__pycache__/
+*.pyc
+
+# Temporales y basura de editor/SO
+*.log
+*.tmp
+*.swp
+.DS_Store
+Thumbs.db
+.pytest_cache/
+.venv/
+.idea/
+.vscode/
