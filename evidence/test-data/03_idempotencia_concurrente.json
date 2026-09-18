@@ -1,0 +1,12 @@
+{
+  "requests": 50,
+  "http_status_counts": {
+    "200": 49,
+    "201": 1
+  },
+  "replay_headers": 49,
+  "distinct_transaction_ids_returned": 1,
+  "transactions_in_db": 1,
+  "ledger_entries_in_db": 2,
+  "final_source_balance": "900.00"
+}

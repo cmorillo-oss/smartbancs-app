@@ -1,0 +1,15 @@
+{
+  "requests": 100,
+  "amount_each": "50.00",
+  "elapsed_seconds": 2.606,
+  "http_status_counts": {
+    "201": 20,
+    "422": 80
+  },
+  "error_code_counts": {
+    "INSUFFICIENT_FUNDS": 80
+  },
+  "final_source_balance": "0.00",
+  "final_sink_balance": "1000.00",
+  "completed_transactions_in_db": 20
+}

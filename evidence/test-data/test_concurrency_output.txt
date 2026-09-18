@@ -1,0 +1,15 @@
+============================= test session starts ==============================
+platform linux -- Python 3.11.16, pytest-8.3.4, pluggy-1.6.0 -- /usr/local/bin/python3.11
+cachedir: .pytest_cache
+rootdir: /tests
+configfile: pytest.ini
+plugins: asyncio-0.25.0, anyio-4.15.1
+asyncio: mode=Mode.AUTO, asyncio_default_fixture_loop_scope=function
+collecting ... collected 4 items
+
+concurrency/test_race_conditions.py::test_sobregiro_concurrente PASSED   [ 25%]
+concurrency/test_race_conditions.py::test_suma_cero PASSED               [ 50%]
+concurrency/test_race_conditions.py::test_idempotencia_bajo_concurrencia PASSED [ 75%]
+concurrency/test_race_conditions.py::test_integridad_del_ledger PASSED   [100%]
+
+============================== 4 passed in 14.67s ==============================

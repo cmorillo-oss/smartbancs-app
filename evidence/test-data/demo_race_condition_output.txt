@@ -1,0 +1,31 @@
+
+DEMO: CONDICIÓN DE CARRERA (race condition) EN TRANSFERENCIAS
+
+ESCENARIO A: 100 transferencias simultáneas de 50.00 sobre una cuenta con 1000.00 (deben triunfar 20)
+==============================================================================
+                                  INSEGURO (sin FOR UPDATE)  SEGURO (API real)
+------------------------------------------------------------------------------
+Transferencias exitosas           100                        20               
+  (correcto: 20)                                                              
+Saldo final origen                950.00                     0.00             
+  (correcto: 0.00)                                                            
+Saldo final destino               50.00                      1000.00          
+  (correcto: 1000.00)                                                         
+DINERO FANTASMA (total-1000)      0.00                       0.00             
+------------------------------------------------------------------------------
+Veredicto                         CORRUPTO                   CORRECTO         
+
+  El sistema INSEGURO confirmó 100 transferencias de 50.00 = 5000 prometidos a clientes, con solo 1000.00 disponibles.
+
+ESCENARIO B: 200 transferencias aleatorias entre 20 cuentas (el dinero total debe conservarse)
+==============================================================================
+                                  INSEGURO (sin FOR UPDATE)  SEGURO (API real)
+------------------------------------------------------------------------------
+Dinero total antes                200000.00                  200000.00        
+Dinero total después              204551.00                  200000.00        
+DINERO FANTASMA (después-antes)   4551.00                    0.00             
+Transferencias exitosas           125                        200              
+Deadlocks de PostgreSQL           75                         0 (orden fijo)   
+------------------------------------------------------------------------------
+Veredicto                         CORRUPTO                   CORRECTO         
+

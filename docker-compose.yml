@@ -41,6 +41,13 @@ services:
     depends_on:
       postgres:
         condition: service_healthy
+    healthcheck:
+      # POR QUÉ: el servicio de pruebas (y cualquier consumidor) debe esperar a que la API
+      # RESPONDA, no solo a que el contenedor haya arrancado. Usa /health (liveness, sin BD).
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health', timeout=2)"]
+      interval: 3s
+      timeout: 3s
+      retries: 15
 
   prometheus:
     image: prom/prometheus:v2.55.1
@@ -50,6 +57,23 @@ services:
       - "${PROMETHEUS_PORT:-9090}:9090"
     depends_on:
       - transaction-api
+
+  # Ejecutor de pruebas. `profiles: [test]` => NO arranca con `docker compose up`; solo cuando se
+  # pide explícitamente. POR QUÉ en contenedor: las pruebas corren dentro de la red de Compose
+  # (mismos nombres de host que la API) y no exigen instalar Python ni dependencias en la máquina.
+  tests:
+    build: ./tests
+    profiles: ["test"]
+    environment:
+      API_URL: http://transaction-api:8000
+      DATABASE_DSN: postgresql://${POSTGRES_USER:-smartbancs}:${POSTGRES_PASSWORD:-smartbancs}@postgres:5432/${POSTGRES_DB:-smartbancs}
+      EVIDENCE_DIR: /evidence/test-data
+    volumes:
+      - ./tests:/tests
+      - ./evidence:/evidence
+    depends_on:
+      transaction-api:
+        condition: service_healthy
 
 volumes:
   pgdata:

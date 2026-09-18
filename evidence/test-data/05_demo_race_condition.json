@@ -1,0 +1,40 @@
+{
+  "escenario_A_sobregiro": {
+    "inseguro": {
+      "deadlocks": 0,
+      "exitos": 100,
+      "saldo_origen": "950.00",
+      "saldo_destino": "50.00",
+      "dinero_total": "1000.00",
+      "dinero_fantasma": "0.00",
+      "segundos": 1.98
+    },
+    "seguro": {
+      "deadlocks": 0,
+      "exitos": 20,
+      "saldo_origen": "0.00",
+      "saldo_destino": "1000.00",
+      "dinero_total": "1000.00",
+      "dinero_fantasma": "0.00",
+      "segundos": 2.72
+    }
+  },
+  "escenario_B_suma_cero": {
+    "inseguro": {
+      "deadlocks": 75,
+      "exitos": 125,
+      "dinero_antes": "200000.00",
+      "dinero_despues": "204551.00",
+      "dinero_fantasma": "4551.00",
+      "segundos": 44.46
+    },
+    "seguro": {
+      "deadlocks": 0,
+      "exitos": 200,
+      "dinero_antes": "200000.00",
+      "dinero_despues": "200000.00",
+      "dinero_fantasma": "0.00",
+      "segundos": 6.08
+    }
+  }
+}
