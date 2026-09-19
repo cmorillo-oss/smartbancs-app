@@ -1,0 +1,2226 @@
+{
+  "samples": [
+    {
+      "t": 1.0,
+      "pool_checked_out": 30.0,
+      "pool_waiting": 20.0,
+      "ready_http": 503,
+      "ready_ms": 1098,
+      "ready_database": "pool_exhausted"
+    },
+    {
+      "t": 3.9,
+      "pool_checked_out": 30.0,
+      "pool_waiting": 120.0,
+      "ready_http": 503,
+      "ready_ms": 1188,
+      "ready_database": "pool_exhausted"
+    },
+    {
+      "t": 7.1,
+      "pool_checked_out": 30.0,
+      "pool_waiting": 174.0,
+      "ready_http": 503,
+      "ready_ms": 2657,
+      "ready_database": "pool_exhausted"
+    },
+    {
+      "t": 14.6,
+      "pool_checked_out": 24.0,
+      "pool_waiting": 0,
+      "ready_http": 200,
+      "ready_ms": 862,
+      "ready_database": "connected"
+    },
+    {
+      "t": 22.2,
+      "pool_checked_out": 30.0,
+      "pool_waiting": 0,
+      "ready_http": 503,
+      "ready_ms": 2025,
+      "ready_database": "pool_exhausted"
+    },
+    {
+      "t": 31.9,
+      "pool_checked_out": 30.0,
+      "pool_waiting": 103.0,
+      "ready_http": 200,
+      "ready_ms": 2565,
+      "ready_database": "connected"
+    },
+    {
+      "t": 43.6,
+      "pool_checked_out": 30.0,
+      "pool_waiting": 24.0,
+      "ready_http": 503,
+      "ready_ms": 2147,
+      "ready_database": "pool_exhausted"
+    }
+  ],
+  "duration_s": 45,
+  "pool_capacity": 30,
+  "client_outcomes": {
+    "503:LOCK_TIMEOUT": 1203,
+    "503:POOL_TIMEOUT": 422
+  },
+  "peak_waiting": 174.0,
+  "ready_first_503_at_s": 1.0,
+  "culprit_identified_at_s": 1.0,
+  "diagnostics": {
+    "blocking_tree": {
+      "roots": 1,
+      "tree": [
+        {
+          "pid": 4200,
+          "application_name": "incident-simulator",
+          "state": "idle in transaction",
+          "transaction_seconds": 2.39,
+          "query": "SELECT 1 FROM accounts WHERE id = $1 FOR UPDATE",
+          "blocked_sessions": 30,
+          "blocks": [
+            {
+              "pid": 3513,
+              "application_name": "transaction-api",
+              "state": "active",
+              "transaction_seconds": 1.96,
+              "query": " SELECT id, account_number, customer_id, balance, currency, status FROM accounts WHERE id = ANY($1) ORDER BY id -- CRÍTICO: siempre ascendente (ver docstring) FOR UPDATE ",
+              "blocked_sessions": 29,
+              "blocks": [
+                {
+                  "pid": 2060,
+                  "application_name": "transaction-api",
+                  "state": "active",
+                  "transaction_seconds": 1.93,
+                  "query": " SELECT id, account_number, customer_id, balance, currency, status FROM accounts WHERE id = ANY($1) ORDER BY id -- CRÍTICO: siempre ascendente (ver docstring) FOR UPDATE ",
+                  "blocked_sessions": 0,
+                  "blocks": []
+                },
+                {
+                  "pid": 2061,
+                  "application_name": "transaction-api",
+                  "state": "active",
+                  "transaction_seconds": 1.94,
+                  "query": " SELECT id, account_number, customer_id, balance, currency, status FROM accounts WHERE id = ANY($1) ORDER BY id -- CRÍTICO: siempre ascendente (ver docstring) FOR UPDATE ",
+                  "blocked_sessions": 0,
+                  "blocks": []
+                },
+                {
+                  "pid": 2978,
+                  "application_name": "transaction-api",
+                  "state": "active",
+                  "transaction_seconds": 1.94,
+                  "query": " SELECT id, account_number, customer_id, balance, currency, status FROM accounts WHERE id = ANY($1) ORDER BY id -- CRÍTICO: siempre ascendente (ver docstring) FOR UPDATE ",
+                  "blocked_sessions": 0,
+                  "blocks": []
+                },
+                {
+                  "pid": 2983,
+                  "application_name": "transaction-api",
+                  "state": "active",
+                  "transaction_seconds": 1.95,
+                  "query": " SELECT id, account_number, customer_id, balance, currency, status FROM accounts WHERE id = ANY($1) ORDER BY id -- CRÍTICO: siempre ascendente (ver docstring) FOR UPDATE ",
+                  "blocked_sessions": 0,
+                  "blocks": []
+                },
+                {
+                  "pid": 2984,
+                  "application_name": "transaction-api",
+                  "state": "active",
+                  "transaction_seconds": 1.93,
+                  "query": " SELECT id, account_number, customer_id, balance, currency, status FROM accounts WHERE id = ANY($1) ORDER BY id -- CRÍTICO: siempre ascendente (ver docstring) FOR UPDATE ",
+                  "blocked_sessions": 0,
+                  "blocks": []
+                },
+                {
+                  "pid": 3259,
+                  "application_name": "transaction-api",
+                  "state": "active",
+                  "transaction_seconds": 1.95,
+                  "query": " SELECT id, account_number, customer_id, balance, currency, status FROM accounts WHERE id = ANY($1) ORDER BY id -- CRÍTICO: siempre ascendente (ver docstring) FOR UPDATE ",
+                  "blocked_sessions": 0,
+                  "blocks": []
+                },
+                {
+                  "pid": 3373,
+                  "application_name": "transaction-api",
+                  "state": "active",
+                  "transaction_seconds": 1.95,
+                  "query": " SELECT id, account_number, customer_id, balance, currency, status FROM accounts WHERE id = ANY($1) ORDER BY id -- CRÍTICO: siempre ascendente (ver docstring) FOR UPDATE ",
+                  "blocked_sessions": 0,
+                  "blocks": []
+                },
+                {
+                  "pid": 3382,
+                  "application_name": "transaction-api",
+                  "state": "active",
+                  "transaction_seconds": 1.95,
+                  "query": " SELECT id, account_number, customer_id, balance, currency, status FROM accounts WHERE id = ANY($1) ORDER BY id -- CRÍTICO: siempre ascendente (ver docstring) FOR UPDATE ",
+                  "blocked_sessions": 0,
+                  "blocks": []
+                },
+                {
+                  "pid": 3508,
+                  "application_name": "transaction-api",
+                  "state": "active",
+                  "transaction_seconds": 1.95,
+                  "query": " SELECT id, account_number, customer_id, balance, currency, status FROM accounts WHERE id = ANY($1) ORDER BY id -- CRÍTICO: siempre ascendente (ver docstring) FOR UPDATE ",
+                  "blocked_sessions": 0,
+                  "blocks": []
+                },
+                {
+                  "pid": 3509,
+                  "application_name": "transaction-api",
+                  "state": "active",
+                  "transaction_seconds": 1.95,
+                  "query": " SELECT id, account_number, customer_id, balance, currency, status FROM accounts WHERE id = ANY($1) ORDER BY id -- CRÍTICO: siempre ascendente (ver docstring) FOR UPDATE ",
+                  "blocked_sessions": 0,
+                  "blocks": []
+                },
+                {
+                  "pid": 3510,
+                  "application_name": "transaction-api",
+                  "state": "active",
+                  "transaction_seconds": 1.95,
+                  "query": " SELECT id, account_number, customer_id, balance, currency, status FROM accounts WHERE id = ANY($1) ORDER BY id -- CRÍTICO: siempre ascendente (ver docstring) FOR UPDATE ",
+                  "blocked_sessions": 0,
+                  "blocks": []
+                },
+                {
+                  "pid": 3511,
+                  "application_name": "transaction-api",
+                  "state": "active",
+                  "transaction_seconds": 1.95,
+                  "query": " SELECT id, account_number, customer_id, balance, currency, status FROM accounts WHERE id = ANY($1) ORDER BY id -- CRÍTICO: siempre ascendente (ver docstring) FOR UPDATE ",
+                  "blocked_sessions": 0,
+                  "blocks": []
+                },
+                {
+                  "pid": 3827,
+                  "application_name": "transaction-api",
+                  "state": "active",
+                  "transaction_seconds": 1.92,
+                  "query": " SELECT id, account_number, customer_id, balance, currency, status FROM accounts WHERE id = ANY($1) ORDER BY id -- CRÍTICO: siempre ascendente (ver docstring) FOR UPDATE ",
+                  "blocked_sessions": 0,
+                  "blocks": []
+                },
+                {
+                  "pid": 3828,
+                  "application_name": "transaction-api",
+                  "state": "active",
+                  "transaction_seconds": 1.95,
+                  "query": " SELECT id, account_number, customer_id, balance, currency, status FROM accounts WHERE id = ANY($1) ORDER BY id -- CRÍTICO: siempre ascendente (ver docstring) FOR UPDATE ",
+                  "blocked_sessions": 0,
+                  "blocks": []
+                },
+                {
+                  "pid": 3829,
+                  "application_name": "transaction-api",
+                  "state": "active",
+                  "transaction_seconds": 1.95,
+                  "query": " SELECT id, account_number, customer_id, balance, currency, status FROM accounts WHERE id = ANY($1) ORDER BY id -- CRÍTICO: siempre ascendente (ver docstring) FOR UPDATE ",
+                  "blocked_sessions": 0,
+                  "blocks": []
+                },
+                {
+                  "pid": 3831,
+                  "application_name": "transaction-api",
+                  "state": "active",
+                  "transaction_seconds": 1.93,
+                  "query": " SELECT id, account_number, customer_id, balance, currency, status FROM accounts WHERE id = ANY($1) ORDER BY id -- CRÍTICO: siempre ascendente (ver docstring) FOR UPDATE ",
+                  "blocked_sessions": 0,
+                  "blocks": []
+                },
+                {
+                  "pid": 3832,
+                  "application_name": "transaction-api",
+                  "state": "active",
+                  "transaction_seconds": 1.95,
+                  "query": " SELECT id, account_number, customer_id, balance, currency, status FROM accounts WHERE id = ANY($1) ORDER BY id -- CRÍTICO: siempre ascendente (ver docstring) FOR UPDATE ",
+                  "blocked_sessions": 0,
+                  "blocks": []
+                },
+                {
+                  "pid": 3833,
+                  "application_name": "transaction-api",
+                  "state": "active",
+                  "transaction_seconds": 1.95,
+                  "query": " SELECT id, account_number, customer_id, balance, currency, status FROM accounts WHERE id = ANY($1) ORDER BY id -- CRÍTICO: siempre ascendente (ver docstring) FOR UPDATE ",
+                  "blocked_sessions": 0,
+                  "blocks": []
+                },
+                {
+                  "pid": 3834,
+                  "application_name": "transaction-api",
+                  "state": "active",
+                  "transaction_seconds": 1.95,
+                  "query": " SELECT id, account_number, customer_id, balance, currency, status FROM accounts WHERE id = ANY($1) ORDER BY id -- CRÍTICO: siempre ascendente (ver docstring) FOR UPDATE ",
+                  "blocked_sessions": 0,
+                  "blocks": []
+                },
+                {
+                  "pid": 4201,
+                  "application_name": "transaction-api",
+                  "state": "active",
+                  "transaction_seconds": 1.9,
+                  "query": " SELECT id, account_number, customer_id, balance, currency, status FROM accounts WHERE id = ANY($1) ORDER BY id -- CRÍTICO: siempre ascendente (ver docstring) FOR UPDATE ",
+                  "blocked_sessions": 0,
+                  "blocks": []
+                },
+                {
+                  "pid": 4202,
+                  "application_name": "transaction-api",
+                  "state": "active",
+                  "transaction_seconds": 1.89,
+                  "query": " SELECT id, account_number, customer_id, balance, currency, status FROM accounts WHERE id = ANY($1) ORDER BY id -- CRÍTICO: siempre ascendente (ver docstring) FOR UPDATE ",
+                  "blocked_sessions": 0,
+                  "blocks": []
+                },
+                {
+                  "pid": 4203,
+                  "application_name": "transaction-api",
+                  "state": "active",
+                  "transaction_seconds": 1.9,
+                  "query": " SELECT id, account_number, customer_id, balance, currency, status FROM accounts WHERE id = ANY($1) ORDER BY id -- CRÍTICO: siempre ascendente (ver docstring) FOR UPDATE ",
+                  "blocked_sessions": 0,
+                  "blocks": []
+                },
+                {
+                  "pid": 4204,
+                  "application_name": "transaction-api",
+                  "state": "active",
+                  "transaction_seconds": 1.9,
+                  "query": " SELECT id, account_number, customer_id, balance, currency, status FROM accounts WHERE id = ANY($1) ORDER BY id -- CRÍTICO: siempre ascendente (ver docstring) FOR UPDATE ",
+                  "blocked_sessions": 0,
+                  "blocks": []
+                },
+                {
+                  "pid": 4205,
+                  "application_name": "transaction-api",
+                  "state": "active",
+                  "transaction_seconds": 1.9,
+                  "query": " SELECT id, account_number, customer_id, balance, currency, status FROM accounts WHERE id = ANY($1) ORDER BY id -- CRÍTICO: siempre ascendente (ver docstring) FOR UPDATE ",
+                  "blocked_sessions": 0,
+                  "blocks": []
+                },
+                {
+                  "pid": 4206,
+                  "application_name": "transaction-api",
+                  "state": "active",
+                  "transaction_seconds": 1.46,
+                  "query": " SELECT id, account_number, customer_id, balance, currency, status FROM accounts WHERE id = ANY($1) ORDER BY id -- CRÍTICO: siempre ascendente (ver docstring) FOR UPDATE ",
+                  "blocked_sessions": 0,
+                  "blocks": []
+                },
+                {
+                  "pid": 4207,
+                  "application_name": "transaction-api",
+                  "state": "active",
+                  "transaction_seconds": 1.45,
+                  "query": " SELECT id, account_number, customer_id, balance, currency, status FROM accounts WHERE id = ANY($1) ORDER BY id -- CRÍTICO: siempre ascendente (ver docstring) FOR UPDATE ",
+                  "blocked_sessions": 0,
+                  "blocks": []
+                },
+                {
+                  "pid": 4208,
+                  "application_name": "transaction-api",
+                  "state": "active",
+                  "transaction_seconds": 1.45,
+                  "query": " SELECT id, account_number, customer_id, balance, currency, status FROM accounts WHERE id = ANY($1) ORDER BY id -- CRÍTICO: siempre ascendente (ver docstring) FOR UPDATE ",
+                  "blocked_sessions": 0,
+                  "blocks": []
+                },
+                {
+                  "pid": 4209,
+                  "application_name": "transaction-api",
+                  "state": "active",
+                  "transaction_seconds": 1.41,
+                  "query": " SELECT id, account_number, customer_id, balance, currency, status FROM accounts WHERE id = ANY($1) ORDER BY id -- CRÍTICO: siempre ascendente (ver docstring) FOR UPDATE ",
+                  "blocked_sessions": 0,
+                  "blocks": []
+                },
+                {
+                  "pid": 4210,
+                  "application_name": "transaction-api",
+                  "state": "active",
+                  "transaction_seconds": 1.47,
+                  "query": " SELECT id, account_number, customer_id, balance, currency, status FROM accounts WHERE id = ANY($1) ORDER BY id -- CRÍTICO: siempre ascendente (ver docstring) FOR UPDATE ",
+                  "blocked_sessions": 0,
+                  "blocks": []
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "cycle_sessions": [],
+      "summary": "pid 4200 (incident-simulator, idle in transaction) bloquea a 30 sesión(es); su última consulta: SELECT 1 FROM accounts WHERE id = $1 FOR UPDATE"
+    },
+    "pool": {
+      "api_pool": {
+        "size": 20,
+        "checked_in": 0,
+        "checked_out": 30,
+        "overflow": 10,
+        "capacity": 30,
+        "waiting": 95,
+        "utilization": 1.0,
+        "pool_timeout_s": 5
+      },
+      "database_connections": [
+        {
+          "application_name": "transaction-api",
+          "state": "active",
+          "connections": 30
+        },
+        {
+          "application_name": "outbox-worker",
+          "state": "idle",
+          "connections": 5
+        },
+        {
+          "application_name": "incident-simulator",
+          "state": "idle",
+          "connections": 1
+        },
+        {
+          "application_name": "incident-simulator",
+          "state": "idle in transaction",
+          "connections": 1
+        },
+        {
+          "application_name": "transaction-api-diagnostics",
+          "state": "active",
+          "connections": 1
+        }
+      ],
+      "max_connections": 100,
+      "verdict": "POOL AGOTADO: 95 peticiones esperando conexión (30/30 en uso)"
+    },
+    "locks": {
+      "blocked_sessions": 30,
+      "sessions": [
+        {
+          "pid": 4200,
+          "application_name": "incident-simulator",
+          "state": "idle in transaction",
+          "wait_event_type": "Client",
+          "wait_event": "ClientRead",
+          "transaction_seconds": 2.79,
+          "query_seconds": 2.79,
+          "query": "SELECT 1 FROM accounts WHERE id = $1 FOR UPDATE",
+          "blocked_by": [],
+          "locks": [
+            {
+              "type": "relation",
+              "mode": "RowShareLock",
+              "granted": true,
+              "relation": "idx_accounts_customer"
+            },
+            {
+              "type": "relation",
+              "mode": "RowShareLock",
+              "granted": true,
+              "relation": "accounts_account_number_key"
+            },
+            {
+              "type": "relation",
+              "mode": "RowShareLock",
+              "granted": true,
+              "relation": "accounts_pkey"
+            },
+            {
+              "type": "relation",
+              "mode": "RowShareLock",
+              "granted": true,
+              "relation": "accounts"
+            },
+            {
+              "type": "transactionid",
+              "mode": "ExclusiveLock",
+              "granted": true,
+              "relation": null
+            }
+          ]
+        },
+        {
+          "pid": 3513,
+          "application_name": "transaction-api",
+          "state": "active",
+          "wait_event_type": "Lock",
+          "wait_event": "transactionid",
+          "transaction_seconds": 2.36,
+          "query_seconds": 2.34,
+          "query": " SELECT id, account_number, customer_id, balance, currency, status FROM accounts WHERE id = ANY($1) ORDER BY id -- CRÍTICO: siempre ascendente (ver docstring) FOR UPDATE ",
+          "blocked_by": [
+            4200
+          ],
+          "locks": [
+            {
+              "type": "relation",
+              "mode": "AccessShareLock",
+              "granted": true,
+              "relation": "accounts"
+            },
+            {
+              "type": "relation",
+              "mode": "RowShareLock",
+              "granted": true,
+              "relation": "accounts"
+            },
+            {
+              "type": "tuple",
+              "mode": "AccessExclusiveLock",
+              "granted": true,
+              "relation": "accounts"
+            },
+            {
+              "type": "transactionid",
+              "mode": "ShareLock",
+              "granted": false,
+              "relation": null
+            }
+          ]
+        },
+        {
+          "pid": 3510,
+          "application_name": "transaction-api",
+          "state": "active",
+          "wait_event_type": "Lock",
+          "wait_event": "tuple",
+          "transaction_seconds": 2.36,
+          "query_seconds": 2.34,
+          "query": " SELECT id, account_number, customer_id, balance, currency, status FROM accounts WHERE id = ANY($1) ORDER BY id -- CRÍTICO: siempre ascendente (ver docstring) FOR UPDATE ",
+          "blocked_by": [
+            3513
+          ],
+          "locks": [
+            {
+              "type": "relation",
+              "mode": "AccessShareLock",
+              "granted": true,
+              "relation": "accounts"
+            },
+            {
+              "type": "relation",
+              "mode": "RowShareLock",
+              "granted": true,
+              "relation": "accounts"
+            },
+            {
+              "type": "tuple",
+              "mode": "AccessExclusiveLock",
+              "granted": false,
+              "relation": "accounts"
+            }
+          ]
+        },
+        {
+          "pid": 2983,
+          "application_name": "transaction-api",
+          "state": "active",
+          "wait_event_type": "Lock",
+          "wait_event": "tuple",
+          "transaction_seconds": 2.36,
+          "query_seconds": 2.34,
+          "query": " SELECT id, account_number, customer_id, balance, currency, status FROM accounts WHERE id = ANY($1) ORDER BY id -- CRÍTICO: siempre ascendente (ver docstring) FOR UPDATE ",
+          "blocked_by": [
+            3513,
+            3510
+          ],
+          "locks": [
+            {
+              "type": "relation",
+              "mode": "AccessShareLock",
+              "granted": true,
+              "relation": "accounts"
+            },
+            {
+              "type": "relation",
+              "mode": "RowShareLock",
+              "granted": true,
+              "relation": "accounts"
+            },
+            {
+              "type": "tuple",
+              "mode": "AccessExclusiveLock",
+              "granted": false,
+              "relation": "accounts"
+            }
+          ]
+        },
+        {
+          "pid": 3833,
+          "application_name": "transaction-api",
+          "state": "active",
+          "wait_event_type": "Lock",
+          "wait_event": "tuple",
+          "transaction_seconds": 2.36,
+          "query_seconds": 2.34,
+          "query": " SELECT id, account_number, customer_id, balance, currency, status FROM accounts WHERE id = ANY($1) ORDER BY id -- CRÍTICO: siempre ascendente (ver docstring) FOR UPDATE ",
+          "blocked_by": [
+            3513,
+            3510,
+            2983
+          ],
+          "locks": [
+            {
+              "type": "relation",
+              "mode": "AccessShareLock",
+              "granted": true,
+              "relation": "accounts"
+            },
+            {
+              "type": "relation",
+              "mode": "RowShareLock",
+              "granted": true,
+              "relation": "accounts"
+            },
+            {
+              "type": "tuple",
+              "mode": "AccessExclusiveLock",
+              "granted": false,
+              "relation": "accounts"
+            }
+          ]
+        },
+        {
+          "pid": 3508,
+          "application_name": "transaction-api",
+          "state": "active",
+          "wait_event_type": "Lock",
+          "wait_event": "tuple",
+          "transaction_seconds": 2.36,
+          "query_seconds": 2.33,
+          "query": " SELECT id, account_number, customer_id, balance, currency, status FROM accounts WHERE id = ANY($1) ORDER BY id -- CRÍTICO: siempre ascendente (ver docstring) FOR UPDATE ",
+          "blocked_by": [
+            3513,
+            3510,
+            2983,
+            3833,
+            3834,
+            3509,
+            3511,
+            3259
+          ],
+          "locks": [
+            {
+              "type": "relation",
+              "mode": "AccessShareLock",
+              "granted": true,
+              "relation": "accounts"
+            },
+            {
+              "type": "relation",
+              "mode": "RowShareLock",
+              "granted": true,
+              "relation": "accounts"
+            },
+            {
+              "type": "tuple",
+              "mode": "AccessExclusiveLock",
+              "granted": false,
+              "relation": "accounts"
+            }
+          ]
+        },
+        {
+          "pid": 3834,
+          "application_name": "transaction-api",
+          "state": "active",
+          "wait_event_type": "Lock",
+          "wait_event": "tuple",
+          "transaction_seconds": 2.36,
+          "query_seconds": 2.34,
+          "query": " SELECT id, account_number, customer_id, balance, currency, status FROM accounts WHERE id = ANY($1) ORDER BY id -- CRÍTICO: siempre ascendente (ver docstring) FOR UPDATE ",
+          "blocked_by": [
+            3513,
+            3510,
+            2983,
+            3833
+          ],
+          "locks": [
+            {
+              "type": "relation",
+              "mode": "AccessShareLock",
+              "granted": true,
+              "relation": "accounts"
+            },
+            {
+              "type": "relation",
+              "mode": "RowShareLock",
+              "granted": true,
+              "relation": "accounts"
+            },
+            {
+              "type": "tuple",
+              "mode": "AccessExclusiveLock",
+              "granted": false,
+              "relation": "accounts"
+            }
+          ]
+        },
+        {
+          "pid": 3511,
+          "application_name": "transaction-api",
+          "state": "active",
+          "wait_event_type": "Lock",
+          "wait_event": "tuple",
+          "transaction_seconds": 2.36,
+          "query_seconds": 2.34,
+          "query": " SELECT id, account_number, customer_id, balance, currency, status FROM accounts WHERE id = ANY($1) ORDER BY id -- CRÍTICO: siempre ascendente (ver docstring) FOR UPDATE ",
+          "blocked_by": [
+            3513,
+            3510,
+            2983,
+            3833,
+            3834,
+            3509
+          ],
+          "locks": [
+            {
+              "type": "relation",
+              "mode": "AccessShareLock",
+              "granted": true,
+              "relation": "accounts"
+            },
+            {
+              "type": "relation",
+              "mode": "RowShareLock",
+              "granted": true,
+              "relation": "accounts"
+            },
+            {
+              "type": "tuple",
+              "mode": "AccessExclusiveLock",
+              "granted": false,
+              "relation": "accounts"
+            }
+          ]
+        },
+        {
+          "pid": 3509,
+          "application_name": "transaction-api",
+          "state": "active",
+          "wait_event_type": "Lock",
+          "wait_event": "tuple",
+          "transaction_seconds": 2.36,
+          "query_seconds": 2.34,
+          "query": " SELECT id, account_number, customer_id, balance, currency, status FROM accounts WHERE id = ANY($1) ORDER BY id -- CRÍTICO: siempre ascendente (ver docstring) FOR UPDATE ",
+          "blocked_by": [
+            3513,
+            3510,
+            2983,
+            3833,
+            3834
+          ],
+          "locks": [
+            {
+              "type": "relation",
+              "mode": "AccessShareLock",
+              "granted": true,
+              "relation": "accounts"
+            },
+            {
+              "type": "relation",
+              "mode": "RowShareLock",
+              "granted": true,
+              "relation": "accounts"
+            },
+            {
+              "type": "tuple",
+              "mode": "AccessExclusiveLock",
+              "granted": false,
+              "relation": "accounts"
+            }
+          ]
+        },
+        {
+          "pid": 3382,
+          "application_name": "transaction-api",
+          "state": "active",
+          "wait_event_type": "Lock",
+          "wait_event": "tuple",
+          "transaction_seconds": 2.35,
+          "query_seconds": 2.32,
+          "query": " SELECT id, account_number, customer_id, balance, currency, status FROM accounts WHERE id = ANY($1) ORDER BY id -- CRÍTICO: siempre ascendente (ver docstring) FOR UPDATE ",
+          "blocked_by": [
+            3513,
+            3510,
+            2983,
+            3833,
+            3834,
+            3509,
+            3511,
+            3259,
+            3508,
+            3832,
+            3829,
+            2061
+          ],
+          "locks": [
+            {
+              "type": "relation",
+              "mode": "AccessShareLock",
+              "granted": true,
+              "relation": "accounts"
+            },
+            {
+              "type": "relation",
+              "mode": "RowShareLock",
+              "granted": true,
+              "relation": "accounts"
+            },
+            {
+              "type": "tuple",
+              "mode": "AccessExclusiveLock",
+              "granted": false,
+              "relation": "accounts"
+            }
+          ]
+        },
+        {
+          "pid": 3832,
+          "application_name": "transaction-api",
+          "state": "active",
+          "wait_event_type": "Lock",
+          "wait_event": "tuple",
+          "transaction_seconds": 2.35,
+          "query_seconds": 2.32,
+          "query": " SELECT id, account_number, customer_id, balance, currency, status FROM accounts WHERE id = ANY($1) ORDER BY id -- CRÍTICO: siempre ascendente (ver docstring) FOR UPDATE ",
+          "blocked_by": [
+            3513,
+            3510,
+            2983,
+            3833,
+            3834,
+            3509,
+            3511,
+            3259,
+            3508
+          ],
+          "locks": [
+            {
+              "type": "relation",
+              "mode": "AccessShareLock",
+              "granted": true,
+              "relation": "accounts"
+            },
+            {
+              "type": "relation",
+              "mode": "RowShareLock",
+              "granted": true,
+              "relation": "accounts"
+            },
+            {
+              "type": "tuple",
+              "mode": "AccessExclusiveLock",
+              "granted": false,
+              "relation": "accounts"
+            }
+          ]
+        },
+        {
+          "pid": 3829,
+          "application_name": "transaction-api",
+          "state": "active",
+          "wait_event_type": "Lock",
+          "wait_event": "tuple",
+          "transaction_seconds": 2.35,
+          "query_seconds": 2.32,
+          "query": " SELECT id, account_number, customer_id, balance, currency, status FROM accounts WHERE id = ANY($1) ORDER BY id -- CRÍTICO: siempre ascendente (ver docstring) FOR UPDATE ",
+          "blocked_by": [
+            3513,
+            3510,
+            2983,
+            3833,
+            3834,
+            3509,
+            3511,
+            3259,
+            3508,
+            3832
+          ],
+          "locks": [
+            {
+              "type": "relation",
+              "mode": "AccessShareLock",
+              "granted": true,
+              "relation": "accounts"
+            },
+            {
+              "type": "relation",
+              "mode": "RowShareLock",
+              "granted": true,
+              "relation": "accounts"
+            },
+            {
+              "type": "tuple",
+              "mode": "AccessExclusiveLock",
+              "granted": false,
+              "relation": "accounts"
+            }
+          ]
+        },
+        {
+          "pid": 3259,
+          "application_name": "transaction-api",
+          "state": "active",
+          "wait_event_type": "Lock",
+          "wait_event": "tuple",
+          "transaction_seconds": 2.35,
+          "query_seconds": 2.33,
+          "query": " SELECT id, account_number, customer_id, balance, currency, status FROM accounts WHERE id = ANY($1) ORDER BY id -- CRÍTICO: siempre ascendente (ver docstring) FOR UPDATE ",
+          "blocked_by": [
+            3513,
+            3510,
+            2983,
+            3833,
+            3834,
+            3509,
+            3511
+          ],
+          "locks": [
+            {
+              "type": "relation",
+              "mode": "AccessShareLock",
+              "granted": true,
+              "relation": "accounts"
+            },
+            {
+              "type": "relation",
+              "mode": "RowShareLock",
+              "granted": true,
+              "relation": "accounts"
+            },
+            {
+              "type": "tuple",
+              "mode": "AccessExclusiveLock",
+              "granted": false,
+              "relation": "accounts"
+            }
+          ]
+        },
+        {
+          "pid": 3373,
+          "application_name": "transaction-api",
+          "state": "active",
+          "wait_event_type": "Lock",
+          "wait_event": "tuple",
+          "transaction_seconds": 2.35,
+          "query_seconds": 2.32,
+          "query": " SELECT id, account_number, customer_id, balance, currency, status FROM accounts WHERE id = ANY($1) ORDER BY id -- CRÍTICO: siempre ascendente (ver docstring) FOR UPDATE ",
+          "blocked_by": [
+            3513,
+            3510,
+            2983,
+            3833,
+            3834,
+            3509,
+            3511,
+            3259,
+            3508,
+            3832,
+            3829,
+            2061,
+            3382
+          ],
+          "locks": [
+            {
+              "type": "relation",
+              "mode": "AccessShareLock",
+              "granted": true,
+              "relation": "accounts"
+            },
+            {
+              "type": "relation",
+              "mode": "RowShareLock",
+              "granted": true,
+              "relation": "accounts"
+            },
+            {
+              "type": "tuple",
+              "mode": "AccessExclusiveLock",
+              "granted": false,
+              "relation": "accounts"
+            }
+          ]
+        },
+        {
+          "pid": 3828,
+          "application_name": "transaction-api",
+          "state": "active",
+          "wait_event_type": "Lock",
+          "wait_event": "tuple",
+          "transaction_seconds": 2.35,
+          "query_seconds": 2.32,
+          "query": " SELECT id, account_number, customer_id, balance, currency, status FROM accounts WHERE id = ANY($1) ORDER BY id -- CRÍTICO: siempre ascendente (ver docstring) FOR UPDATE ",
+          "blocked_by": [
+            3513,
+            3510,
+            2983,
+            3833,
+            3834,
+            3509,
+            3511,
+            3259,
+            3508,
+            3832,
+            3829,
+            2061,
+            3382,
+            3373,
+            2978,
+            2060
+          ],
+          "locks": [
+            {
+              "type": "relation",
+              "mode": "AccessShareLock",
+              "granted": true,
+              "relation": "accounts"
+            },
+            {
+              "type": "relation",
+              "mode": "RowShareLock",
+              "granted": true,
+              "relation": "accounts"
+            },
+            {
+              "type": "tuple",
+              "mode": "AccessExclusiveLock",
+              "granted": false,
+              "relation": "accounts"
+            }
+          ]
+        },
+        {
+          "pid": 2978,
+          "application_name": "transaction-api",
+          "state": "active",
+          "wait_event_type": "Lock",
+          "wait_event": "tuple",
+          "transaction_seconds": 2.35,
+          "query_seconds": 2.32,
+          "query": " SELECT id, account_number, customer_id, balance, currency, status FROM accounts WHERE id = ANY($1) ORDER BY id -- CRÍTICO: siempre ascendente (ver docstring) FOR UPDATE ",
+          "blocked_by": [
+            3513,
+            3510,
+            2983,
+            3833,
+            3834,
+            3509,
+            3511,
+            3259,
+            3508,
+            3832,
+            3829,
+            2061,
+            3382,
+            3373
+          ],
+          "locks": [
+            {
+              "type": "relation",
+              "mode": "AccessShareLock",
+              "granted": true,
+              "relation": "accounts"
+            },
+            {
+              "type": "relation",
+              "mode": "RowShareLock",
+              "granted": true,
+              "relation": "accounts"
+            },
+            {
+              "type": "tuple",
+              "mode": "AccessExclusiveLock",
+              "granted": false,
+              "relation": "accounts"
+            }
+          ]
+        },
+        {
+          "pid": 2061,
+          "application_name": "transaction-api",
+          "state": "active",
+          "wait_event_type": "Lock",
+          "wait_event": "tuple",
+          "transaction_seconds": 2.34,
+          "query_seconds": 2.32,
+          "query": " SELECT id, account_number, customer_id, balance, currency, status FROM accounts WHERE id = ANY($1) ORDER BY id -- CRÍTICO: siempre ascendente (ver docstring) FOR UPDATE ",
+          "blocked_by": [
+            3513,
+            3510,
+            2983,
+            3833,
+            3834,
+            3509,
+            3511,
+            3259,
+            3508,
+            3832,
+            3829
+          ],
+          "locks": [
+            {
+              "type": "relation",
+              "mode": "AccessShareLock",
+              "granted": true,
+              "relation": "accounts"
+            },
+            {
+              "type": "relation",
+              "mode": "RowShareLock",
+              "granted": true,
+              "relation": "accounts"
+            },
+            {
+              "type": "tuple",
+              "mode": "AccessExclusiveLock",
+              "granted": false,
+              "relation": "accounts"
+            }
+          ]
+        },
+        {
+          "pid": 2984,
+          "application_name": "transaction-api",
+          "state": "active",
+          "wait_event_type": "Lock",
+          "wait_event": "tuple",
+          "transaction_seconds": 2.34,
+          "query_seconds": 2.32,
+          "query": " SELECT id, account_number, customer_id, balance, currency, status FROM accounts WHERE id = ANY($1) ORDER BY id -- CRÍTICO: siempre ascendente (ver docstring) FOR UPDATE ",
+          "blocked_by": [
+            3513,
+            3510,
+            2983,
+            3833,
+            3834,
+            3509,
+            3511,
+            3259,
+            3508,
+            3832,
+            3829,
+            2061,
+            3382,
+            3373,
+            2978,
+            2060,
+            3828
+          ],
+          "locks": [
+            {
+              "type": "relation",
+              "mode": "AccessShareLock",
+              "granted": true,
+              "relation": "accounts"
+            },
+            {
+              "type": "relation",
+              "mode": "RowShareLock",
+              "granted": true,
+              "relation": "accounts"
+            },
+            {
+              "type": "tuple",
+              "mode": "AccessExclusiveLock",
+              "granted": false,
+              "relation": "accounts"
+            }
+          ]
+        },
+        {
+          "pid": 2060,
+          "application_name": "transaction-api",
+          "state": "active",
+          "wait_event_type": "Lock",
+          "wait_event": "tuple",
+          "transaction_seconds": 2.34,
+          "query_seconds": 2.32,
+          "query": " SELECT id, account_number, customer_id, balance, currency, status FROM accounts WHERE id = ANY($1) ORDER BY id -- CRÍTICO: siempre ascendente (ver docstring) FOR UPDATE ",
+          "blocked_by": [
+            3513,
+            3510,
+            2983,
+            3833,
+            3834,
+            3509,
+            3511,
+            3259,
+            3508,
+            3832,
+            3829,
+            2061,
+            3382,
+            3373,
+            2978
+          ],
+          "locks": [
+            {
+              "type": "relation",
+              "mode": "AccessShareLock",
+              "granted": true,
+              "relation": "accounts"
+            },
+            {
+              "type": "relation",
+              "mode": "RowShareLock",
+              "granted": true,
+              "relation": "accounts"
+            },
+            {
+              "type": "tuple",
+              "mode": "AccessExclusiveLock",
+              "granted": false,
+              "relation": "accounts"
+            }
+          ]
+        },
+        {
+          "pid": 3831,
+          "application_name": "transaction-api",
+          "state": "active",
+          "wait_event_type": "Lock",
+          "wait_event": "tuple",
+          "transaction_seconds": 2.33,
+          "query_seconds": 2.32,
+          "query": " SELECT id, account_number, customer_id, balance, currency, status FROM accounts WHERE id = ANY($1) ORDER BY id -- CRÍTICO: siempre ascendente (ver docstring) FOR UPDATE ",
+          "blocked_by": [
+            3513,
+            3510,
+            2983,
+            3833,
+            3834,
+            3509,
+            3511,
+            3259,
+            3508,
+            3832,
+            3829,
+            2061,
+            3382,
+            3373,
+            2978,
+            2060,
+            3828,
+            2984
+          ],
+          "locks": [
+            {
+              "type": "relation",
+              "mode": "AccessShareLock",
+              "granted": true,
+              "relation": "accounts"
+            },
+            {
+              "type": "relation",
+              "mode": "RowShareLock",
+              "granted": true,
+              "relation": "accounts"
+            },
+            {
+              "type": "tuple",
+              "mode": "AccessExclusiveLock",
+              "granted": false,
+              "relation": "accounts"
+            }
+          ]
+        },
+        {
+          "pid": 3827,
+          "application_name": "transaction-api",
+          "state": "active",
+          "wait_event_type": "Lock",
+          "wait_event": "tuple",
+          "transaction_seconds": 2.32,
+          "query_seconds": 2.31,
+          "query": " SELECT id, account_number, customer_id, balance, currency, status FROM accounts WHERE id = ANY($1) ORDER BY id -- CRÍTICO: siempre ascendente (ver docstring) FOR UPDATE ",
+          "blocked_by": [
+            3513,
+            3510,
+            2983,
+            3833,
+            3834,
+            3509,
+            3511,
+            3259,
+            3508,
+            3832,
+            3829,
+            2061,
+            3382,
+            3373,
+            2978,
+            2060,
+            3828,
+            2984,
+            3831
+          ],
+          "locks": [
+            {
+              "type": "relation",
+              "mode": "AccessShareLock",
+              "granted": true,
+              "relation": "accounts"
+            },
+            {
+              "type": "relation",
+              "mode": "RowShareLock",
+              "granted": true,
+              "relation": "accounts"
+            },
+            {
+              "type": "tuple",
+              "mode": "AccessExclusiveLock",
+              "granted": false,
+              "relation": "accounts"
+            }
+          ]
+        },
+        {
+          "pid": 4203,
+          "application_name": "transaction-api",
+          "state": "active",
+          "wait_event_type": "Lock",
+          "wait_event": "tuple",
+          "transaction_seconds": 2.3,
+          "query_seconds": 2.27,
+          "query": " SELECT id, account_number, customer_id, balance, currency, status FROM accounts WHERE id = ANY($1) ORDER BY id -- CRÍTICO: siempre ascendente (ver docstring) FOR UPDATE ",
+          "blocked_by": [
+            3513,
+            3510,
+            2983,
+            3833,
+            3834,
+            3509,
+            3511,
+            3259,
+            3508,
+            3832,
+            3829,
+            2061,
+            3382,
+            3373,
+            2978,
+            2060,
+            3828,
+            2984,
+            3831,
+            3827
+          ],
+          "locks": [
+            {
+              "type": "relation",
+              "mode": "AccessShareLock",
+              "granted": true,
+              "relation": "idx_accounts_customer"
+            },
+            {
+              "type": "relation",
+              "mode": "AccessShareLock",
+              "granted": true,
+              "relation": "accounts_account_number_key"
+            },
+            {
+              "type": "relation",
+              "mode": "AccessShareLock",
+              "granted": true,
+              "relation": "accounts_pkey"
+            },
+            {
+              "type": "relation",
+              "mode": "AccessShareLock",
+              "granted": true,
+              "relation": "accounts"
+            },
+            {
+              "type": "relation",
+              "mode": "RowShareLock",
+              "granted": true,
+              "relation": "accounts"
+            },
+            {
+              "type": "relation",
+              "mode": "RowShareLock",
+              "granted": true,
+              "relation": "accounts_account_number_key"
+            },
+            {
+              "type": "relation",
+              "mode": "RowShareLock",
+              "granted": true,
+              "relation": "idx_accounts_customer"
+            },
+            {
+              "type": "tuple",
+              "mode": "AccessExclusiveLock",
+              "granted": false,
+              "relation": "accounts"
+            },
+            {
+              "type": "relation",
+              "mode": "RowShareLock",
+              "granted": true,
+              "relation": "accounts_pkey"
+            }
+          ]
+        },
+        {
+          "pid": 4201,
+          "application_name": "transaction-api",
+          "state": "active",
+          "wait_event_type": "Lock",
+          "wait_event": "tuple",
+          "transaction_seconds": 2.3,
+          "query_seconds": 2.24,
+          "query": " SELECT id, account_number, customer_id, balance, currency, status FROM accounts WHERE id = ANY($1) ORDER BY id -- CRÍTICO: siempre ascendente (ver docstring) FOR UPDATE ",
+          "blocked_by": [
+            3513,
+            3510,
+            2983,
+            3833,
+            3834,
+            3509,
+            3511,
+            3259,
+            3508,
+            3832,
+            3829,
+            2061,
+            3382,
+            3373,
+            2978,
+            2060,
+            3828,
+            2984,
+            3831,
+            3827,
+            4203,
+            4204,
+            4205
+          ],
+          "locks": [
+            {
+              "type": "relation",
+              "mode": "AccessShareLock",
+              "granted": true,
+              "relation": "idx_accounts_customer"
+            },
+            {
+              "type": "relation",
+              "mode": "AccessShareLock",
+              "granted": true,
+              "relation": "accounts_account_number_key"
+            },
+            {
+              "type": "relation",
+              "mode": "AccessShareLock",
+              "granted": true,
+              "relation": "accounts_pkey"
+            },
+            {
+              "type": "relation",
+              "mode": "AccessShareLock",
+              "granted": true,
+              "relation": "accounts"
+            },
+            {
+              "type": "relation",
+              "mode": "RowShareLock",
+              "granted": true,
+              "relation": "accounts"
+            },
+            {
+              "type": "relation",
+              "mode": "RowShareLock",
+              "granted": true,
+              "relation": "accounts_account_number_key"
+            },
+            {
+              "type": "relation",
+              "mode": "RowShareLock",
+              "granted": true,
+              "relation": "accounts_pkey"
+            },
+            {
+              "type": "relation",
+              "mode": "RowShareLock",
+              "granted": true,
+              "relation": "idx_accounts_customer"
+            },
+            {
+              "type": "tuple",
+              "mode": "AccessExclusiveLock",
+              "granted": false,
+              "relation": "accounts"
+            }
+          ]
+        },
+        {
+          "pid": 4205,
+          "application_name": "transaction-api",
+          "state": "active",
+          "wait_event_type": "Lock",
+          "wait_event": "tuple",
+          "transaction_seconds": 2.3,
+          "query_seconds": 2.25,
+          "query": " SELECT id, account_number, customer_id, balance, currency, status FROM accounts WHERE id = ANY($1) ORDER BY id -- CRÍTICO: siempre ascendente (ver docstring) FOR UPDATE ",
+          "blocked_by": [
+            3513,
+            3510,
+            2983,
+            3833,
+            3834,
+            3509,
+            3511,
+            3259,
+            3508,
+            3832,
+            3829,
+            2061,
+            3382,
+            3373,
+            2978,
+            2060,
+            3828,
+            2984,
+            3831,
+            3827,
+            4203,
+            4204
+          ],
+          "locks": [
+            {
+              "type": "relation",
+              "mode": "AccessShareLock",
+              "granted": true,
+              "relation": "idx_accounts_customer"
+            },
+            {
+              "type": "relation",
+              "mode": "AccessShareLock",
+              "granted": true,
+              "relation": "accounts_account_number_key"
+            },
+            {
+              "type": "relation",
+              "mode": "AccessShareLock",
+              "granted": true,
+              "relation": "accounts_pkey"
+            },
+            {
+              "type": "relation",
+              "mode": "AccessShareLock",
+              "granted": true,
+              "relation": "accounts"
+            },
+            {
+              "type": "relation",
+              "mode": "RowShareLock",
+              "granted": true,
+              "relation": "accounts"
+            },
+            {
+              "type": "relation",
+              "mode": "RowShareLock",
+              "granted": true,
+              "relation": "accounts_pkey"
+            },
+            {
+              "type": "relation",
+              "mode": "RowShareLock",
+              "granted": true,
+              "relation": "idx_accounts_customer"
+            },
+            {
+              "type": "tuple",
+              "mode": "AccessExclusiveLock",
+              "granted": false,
+              "relation": "accounts"
+            },
+            {
+              "type": "relation",
+              "mode": "RowShareLock",
+              "granted": true,
+              "relation": "accounts_account_number_key"
+            }
+          ]
+        },
+        {
+          "pid": 4204,
+          "application_name": "transaction-api",
+          "state": "active",
+          "wait_event_type": "Lock",
+          "wait_event": "tuple",
+          "transaction_seconds": 2.3,
+          "query_seconds": 2.26,
+          "query": " SELECT id, account_number, customer_id, balance, currency, status FROM accounts WHERE id = ANY($1) ORDER BY id -- CRÍTICO: siempre ascendente (ver docstring) FOR UPDATE ",
+          "blocked_by": [
+            3513,
+            3510,
+            2983,
+            3833,
+            3834,
+            3509,
+            3511,
+            3259,
+            3508,
+            3832,
+            3829,
+            2061,
+            3382,
+            3373,
+            2978,
+            2060,
+            3828,
+            2984,
+            3831,
+            3827,
+            4203
+          ],
+          "locks": [
+            {
+              "type": "relation",
+              "mode": "AccessShareLock",
+              "granted": true,
+              "relation": "idx_accounts_customer"
+            },
+            {
+              "type": "relation",
+              "mode": "AccessShareLock",
+              "granted": true,
+              "relation": "accounts_account_number_key"
+            },
+            {
+              "type": "relation",
+              "mode": "AccessShareLock",
+              "granted": true,
+              "relation": "accounts_pkey"
+            },
+            {
+              "type": "relation",
+              "mode": "AccessShareLock",
+              "granted": true,
+              "relation": "accounts"
+            },
+            {
+              "type": "relation",
+              "mode": "RowShareLock",
+              "granted": true,
+              "relation": "accounts"
+            },
+            {
+              "type": "relation",
+              "mode": "RowShareLock",
+              "granted": true,
+              "relation": "idx_accounts_customer"
+            },
+            {
+              "type": "tuple",
+              "mode": "AccessExclusiveLock",
+              "granted": false,
+              "relation": "accounts"
+            },
+            {
+              "type": "relation",
+              "mode": "RowShareLock",
+              "granted": true,
+              "relation": "accounts_pkey"
+            },
+            {
+              "type": "relation",
+              "mode": "RowShareLock",
+              "granted": true,
+              "relation": "accounts_account_number_key"
+            }
+          ]
+        },
+        {
+          "pid": 4202,
+          "application_name": "transaction-api",
+          "state": "active",
+          "wait_event_type": "Lock",
+          "wait_event": "tuple",
+          "transaction_seconds": 2.29,
+          "query_seconds": 2.23,
+          "query": " SELECT id, account_number, customer_id, balance, currency, status FROM accounts WHERE id = ANY($1) ORDER BY id -- CRÍTICO: siempre ascendente (ver docstring) FOR UPDATE ",
+          "blocked_by": [
+            3513,
+            3510,
+            2983,
+            3833,
+            3834,
+            3509,
+            3511,
+            3259,
+            3508,
+            3832,
+            3829,
+            2061,
+            3382,
+            3373,
+            2978,
+            2060,
+            3828,
+            2984,
+            3831,
+            3827,
+            4203,
+            4204,
+            4205,
+            4201
+          ],
+          "locks": [
+            {
+              "type": "relation",
+              "mode": "AccessShareLock",
+              "granted": true,
+              "relation": "idx_accounts_customer"
+            },
+            {
+              "type": "relation",
+              "mode": "AccessShareLock",
+              "granted": true,
+              "relation": "accounts_account_number_key"
+            },
+            {
+              "type": "relation",
+              "mode": "AccessShareLock",
+              "granted": true,
+              "relation": "accounts_pkey"
+            },
+            {
+              "type": "relation",
+              "mode": "AccessShareLock",
+              "granted": true,
+              "relation": "accounts"
+            },
+            {
+              "type": "relation",
+              "mode": "RowShareLock",
+              "granted": true,
+              "relation": "accounts"
+            },
+            {
+              "type": "relation",
+              "mode": "RowShareLock",
+              "granted": true,
+              "relation": "accounts_pkey"
+            },
+            {
+              "type": "relation",
+              "mode": "RowShareLock",
+              "granted": true,
+              "relation": "idx_accounts_customer"
+            },
+            {
+              "type": "tuple",
+              "mode": "AccessExclusiveLock",
+              "granted": false,
+              "relation": "accounts"
+            },
+            {
+              "type": "relation",
+              "mode": "RowShareLock",
+              "granted": true,
+              "relation": "accounts_account_number_key"
+            }
+          ]
+        },
+        {
+          "pid": 4210,
+          "application_name": "transaction-api",
+          "state": "active",
+          "wait_event_type": "Lock",
+          "wait_event": "tuple",
+          "transaction_seconds": 1.87,
+          "query_seconds": 1.84,
+          "query": " SELECT id, account_number, customer_id, balance, currency, status FROM accounts WHERE id = ANY($1) ORDER BY id -- CRÍTICO: siempre ascendente (ver docstring) FOR UPDATE ",
+          "blocked_by": [
+            3513,
+            3510,
+            2983,
+            3833,
+            3834,
+            3509,
+            3511,
+            3259,
+            3508,
+            3832,
+            3829,
+            2061,
+            3382,
+            3373,
+            2978,
+            2060,
+            3828,
+            2984,
+            3831,
+            3827,
+            4203,
+            4204,
+            4205,
+            4201,
+            4202
+          ],
+          "locks": [
+            {
+              "type": "relation",
+              "mode": "AccessShareLock",
+              "granted": true,
+              "relation": "idx_accounts_customer"
+            },
+            {
+              "type": "relation",
+              "mode": "AccessShareLock",
+              "granted": true,
+              "relation": "accounts_account_number_key"
+            },
+            {
+              "type": "relation",
+              "mode": "AccessShareLock",
+              "granted": true,
+              "relation": "accounts_pkey"
+            },
+            {
+              "type": "relation",
+              "mode": "AccessShareLock",
+              "granted": true,
+              "relation": "accounts"
+            },
+            {
+              "type": "relation",
+              "mode": "RowShareLock",
+              "granted": true,
+              "relation": "accounts"
+            },
+            {
+              "type": "relation",
+              "mode": "RowShareLock",
+              "granted": true,
+              "relation": "idx_accounts_customer"
+            },
+            {
+              "type": "tuple",
+              "mode": "AccessExclusiveLock",
+              "granted": false,
+              "relation": "accounts"
+            },
+            {
+              "type": "relation",
+              "mode": "RowShareLock",
+              "granted": true,
+              "relation": "accounts_pkey"
+            },
+            {
+              "type": "relation",
+              "mode": "RowShareLock",
+              "granted": true,
+              "relation": "accounts_account_number_key"
+            }
+          ]
+        },
+        {
+          "pid": 4206,
+          "application_name": "transaction-api",
+          "state": "active",
+          "wait_event_type": "Lock",
+          "wait_event": "tuple",
+          "transaction_seconds": 1.86,
+          "query_seconds": 1.83,
+          "query": " SELECT id, account_number, customer_id, balance, currency, status FROM accounts WHERE id = ANY($1) ORDER BY id -- CRÍTICO: siempre ascendente (ver docstring) FOR UPDATE ",
+          "blocked_by": [
+            3513,
+            3510,
+            2983,
+            3833,
+            3834,
+            3509,
+            3511,
+            3259,
+            3508,
+            3832,
+            3829,
+            2061,
+            3382,
+            3373,
+            2978,
+            2060,
+            3828,
+            2984,
+            3831,
+            3827,
+            4203,
+            4204,
+            4205,
+            4201,
+            4202,
+            4210,
+            4208
+          ],
+          "locks": [
+            {
+              "type": "relation",
+              "mode": "AccessShareLock",
+              "granted": true,
+              "relation": "idx_accounts_customer"
+            },
+            {
+              "type": "relation",
+              "mode": "AccessShareLock",
+              "granted": true,
+              "relation": "accounts_account_number_key"
+            },
+            {
+              "type": "relation",
+              "mode": "AccessShareLock",
+              "granted": true,
+              "relation": "accounts_pkey"
+            },
+            {
+              "type": "relation",
+              "mode": "AccessShareLock",
+              "granted": true,
+              "relation": "accounts"
+            },
+            {
+              "type": "relation",
+              "mode": "RowShareLock",
+              "granted": true,
+              "relation": "accounts"
+            },
+            {
+              "type": "relation",
+              "mode": "RowShareLock",
+              "granted": true,
+              "relation": "accounts_account_number_key"
+            },
+            {
+              "type": "relation",
+              "mode": "RowShareLock",
+              "granted": true,
+              "relation": "idx_accounts_customer"
+            },
+            {
+              "type": "tuple",
+              "mode": "AccessExclusiveLock",
+              "granted": false,
+              "relation": "accounts"
+            },
+            {
+              "type": "relation",
+              "mode": "RowShareLock",
+              "granted": true,
+              "relation": "accounts_pkey"
+            }
+          ]
+        },
+        {
+          "pid": 4208,
+          "application_name": "transaction-api",
+          "state": "active",
+          "wait_event_type": "Lock",
+          "wait_event": "tuple",
+          "transaction_seconds": 1.86,
+          "query_seconds": 1.83,
+          "query": " SELECT id, account_number, customer_id, balance, currency, status FROM accounts WHERE id = ANY($1) ORDER BY id -- CRÍTICO: siempre ascendente (ver docstring) FOR UPDATE ",
+          "blocked_by": [
+            3513,
+            3510,
+            2983,
+            3833,
+            3834,
+            3509,
+            3511,
+            3259,
+            3508,
+            3832,
+            3829,
+            2061,
+            3382,
+            3373,
+            2978,
+            2060,
+            3828,
+            2984,
+            3831,
+            3827,
+            4203,
+            4204,
+            4205,
+            4201,
+            4202,
+            4210
+          ],
+          "locks": [
+            {
+              "type": "relation",
+              "mode": "AccessShareLock",
+              "granted": true,
+              "relation": "idx_accounts_customer"
+            },
+            {
+              "type": "relation",
+              "mode": "AccessShareLock",
+              "granted": true,
+              "relation": "accounts_account_number_key"
+            },
+            {
+              "type": "relation",
+              "mode": "AccessShareLock",
+              "granted": true,
+              "relation": "accounts_pkey"
+            },
+            {
+              "type": "relation",
+              "mode": "AccessShareLock",
+              "granted": true,
+              "relation": "accounts"
+            },
+            {
+              "type": "relation",
+              "mode": "RowShareLock",
+              "granted": true,
+              "relation": "accounts"
+            },
+            {
+              "type": "relation",
+              "mode": "RowShareLock",
+              "granted": true,
+              "relation": "idx_accounts_customer"
+            },
+            {
+              "type": "tuple",
+              "mode": "AccessExclusiveLock",
+              "granted": false,
+              "relation": "accounts"
+            },
+            {
+              "type": "relation",
+              "mode": "RowShareLock",
+              "granted": true,
+              "relation": "accounts_pkey"
+            },
+            {
+              "type": "relation",
+              "mode": "RowShareLock",
+              "granted": true,
+              "relation": "accounts_account_number_key"
+            }
+          ]
+        },
+        {
+          "pid": 4207,
+          "application_name": "transaction-api",
+          "state": "active",
+          "wait_event_type": "Lock",
+          "wait_event": "tuple",
+          "transaction_seconds": 1.85,
+          "query_seconds": 1.82,
+          "query": " SELECT id, account_number, customer_id, balance, currency, status FROM accounts WHERE id = ANY($1) ORDER BY id -- CRÍTICO: siempre ascendente (ver docstring) FOR UPDATE ",
+          "blocked_by": [
+            3513,
+            3510,
+            2983,
+            3833,
+            3834,
+            3509,
+            3511,
+            3259,
+            3508,
+            3832,
+            3829,
+            2061,
+            3382,
+            3373,
+            2978,
+            2060,
+            3828,
+            2984,
+            3831,
+            3827,
+            4203,
+            4204,
+            4205,
+            4201,
+            4202,
+            4210,
+            4208,
+            4206
+          ],
+          "locks": [
+            {
+              "type": "relation",
+              "mode": "AccessShareLock",
+              "granted": true,
+              "relation": "idx_accounts_customer"
+            },
+            {
+              "type": "relation",
+              "mode": "AccessShareLock",
+              "granted": true,
+              "relation": "accounts_account_number_key"
+            },
+            {
+              "type": "relation",
+              "mode": "AccessShareLock",
+              "granted": true,
+              "relation": "accounts_pkey"
+            },
+            {
+              "type": "relation",
+              "mode": "AccessShareLock",
+              "granted": true,
+              "relation": "accounts"
+            },
+            {
+              "type": "relation",
+              "mode": "RowShareLock",
+              "granted": true,
+              "relation": "accounts"
+            },
+            {
+              "type": "relation",
+              "mode": "RowShareLock",
+              "granted": true,
+              "relation": "idx_accounts_customer"
+            },
+            {
+              "type": "tuple",
+              "mode": "AccessExclusiveLock",
+              "granted": false,
+              "relation": "accounts"
+            },
+            {
+              "type": "relation",
+              "mode": "RowShareLock",
+              "granted": true,
+              "relation": "accounts_pkey"
+            },
+            {
+              "type": "relation",
+              "mode": "RowShareLock",
+              "granted": true,
+              "relation": "accounts_account_number_key"
+            }
+          ]
+        },
+        {
+          "pid": 4209,
+          "application_name": "transaction-api",
+          "state": "active",
+          "wait_event_type": "Lock",
+          "wait_event": "tuple",
+          "transaction_seconds": 1.82,
+          "query_seconds": 1.8,
+          "query": " SELECT id, account_number, customer_id, balance, currency, status FROM accounts WHERE id = ANY($1) ORDER BY id -- CRÍTICO: siempre ascendente (ver docstring) FOR UPDATE ",
+          "blocked_by": [
+            3513,
+            3510,
+            2983,
+            3833,
+            3834,
+            3509,
+            3511,
+            3259,
+            3508,
+            3832,
+            3829,
+            2061,
+            3382,
+            3373,
+            2978,
+            2060,
+            3828,
+            2984,
+            3831,
+            3827,
+            4203,
+            4204,
+            4205,
+            4201,
+            4202,
+            4210,
+            4208,
+            4206,
+            4207
+          ],
+          "locks": [
+            {
+              "type": "relation",
+              "mode": "AccessShareLock",
+              "granted": true,
+              "relation": "idx_accounts_customer"
+            },
+            {
+              "type": "relation",
+              "mode": "AccessShareLock",
+              "granted": true,
+              "relation": "accounts_account_number_key"
+            },
+            {
+              "type": "relation",
+              "mode": "AccessShareLock",
+              "granted": true,
+              "relation": "accounts_pkey"
+            },
+            {
+              "type": "relation",
+              "mode": "AccessShareLock",
+              "granted": true,
+              "relation": "accounts"
+            },
+            {
+              "type": "relation",
+              "mode": "RowShareLock",
+              "granted": true,
+              "relation": "accounts"
+            },
+            {
+              "type": "relation",
+              "mode": "RowShareLock",
+              "granted": true,
+              "relation": "accounts_account_number_key"
+            },
+            {
+              "type": "relation",
+              "mode": "RowShareLock",
+              "granted": true,
+              "relation": "accounts_pkey"
+            },
+            {
+              "type": "relation",
+              "mode": "RowShareLock",
+              "granted": true,
+              "relation": "idx_accounts_customer"
+            },
+            {
+              "type": "tuple",
+              "mode": "AccessExclusiveLock",
+              "granted": false,
+              "relation": "accounts"
+            }
+          ]
+        }
+      ]
+    },
+    "diagnostic_query_ms": 554
+  },
+  "prometheus_alerts": {
+    "DatabasePoolExhausted": {
+      "pending": 7.1,
+      "firing": 22.2
+    },
+    "TransferLatencyP95High": {
+      "pending": 14.6,
+      "firing": 43.6
+    },
+    "TransferErrorRateHigh": {
+      "pending": 14.6,
+      "firing": 43.6
+    }
+  },
+  "recovered_after_s": 0.0
+}

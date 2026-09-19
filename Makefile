@@ -1,4 +1,4 @@
-.PHONY: etl bancs-sync-log bancs-degradation test-integration bancs-resilience up down logs test clean seed test-concurrency demo-race test-unit ai-down ai-up ai-resilience
+.PHONY: deadlock-demo exhaust-pool load diagnostics alerts-test etl bancs-sync-log bancs-degradation test-integration bancs-resilience up down logs test clean seed test-concurrency demo-race test-unit ai-down ai-up ai-resilience
 
 # Levanta todo en segundo plano y reconstruye la imagen si cambió el código.
 up:
@@ -72,3 +72,30 @@ test-integration:
 # Bancs se cae y vuelve: las transferencias siguen y el atraso se sincroniza solo.
 bancs-resilience:
 	bash scripts/bancs_resilience_demo.sh
+
+# INCIDENTE 1 (Fase 7): deadlocks REALES con orden invertido vs cero con orden determinista.
+deadlock-demo:
+	docker compose up -d --build
+	docker compose --profile test run --rm -T tests python incident/reproduce_deadlock.py 2>&1 | tee evidence/incident/deadlock_demo_console.txt
+	-docker compose logs postgres 2>&1 | grep -B1 -A8 "deadlock detected" | head -40 > evidence/incident/postgres_log_deadlock.txt
+
+# INCIDENTE 2 (Fase 7): agotamiento del pool por una transaccion larga; muestra deteccion y diagnostico.
+exhaust-pool:
+	docker compose up -d --build
+	docker compose --profile test run --rm -T tests python incident/exhaust_pool.py
+
+# Prueba de carga: rampa hasta saturacion sobre 5000 cuentas distintas.
+load:
+	bash scripts/load_test.sh
+
+# Endpoints de diagnostico para el operador.
+diagnostics:
+	@echo "== pool"; curl -s localhost:8000/api/v1/admin/diagnostics/pool | python -m json.tool
+	@echo "== blocking-tree"; curl -s localhost:8000/api/v1/admin/diagnostics/blocking-tree | python -m json.tool
+	@echo "== locks"; curl -s localhost:8000/api/v1/admin/diagnostics/locks | python -m json.tool
+	@echo "== slow-queries"; curl -s "localhost:8000/api/v1/admin/diagnostics/slow-queries?limit=5" | python -m json.tool
+
+# Prueba unitaria de las reglas de alerta (necesita el contenedor de prometheus arriba).
+alerts-test:
+	docker compose up -d prometheus
+	docker compose exec -T prometheus promtool test rules /etc/prometheus/alerts_test.yml

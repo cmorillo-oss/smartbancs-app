@@ -1,8 +1,8 @@
 {
   "requests": 50,
   "http_status_counts": {
-    "200": 49,
-    "201": 1
+    "201": 1,
+    "200": 49
   },
   "replay_headers": 49,
   "distinct_transaction_ids_returned": 1,

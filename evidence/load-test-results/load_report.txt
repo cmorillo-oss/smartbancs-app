@@ -1,0 +1,18 @@
+PRUEBA DE CARGA: rampa por escalones (bucle cerrado, sin pausas entre peticiones)
+======================================================================================================================
+5000 cuentas distintas | mezcla 70% transferencias / 20% saldo / 10% historial | SLO: p95 < 2000 ms y errores < 1%
+
+Usuarios    Req/s  TPS transf.     p50     p95     p99  % error  cola pool (máx)  pool en uso  SLO
+----------------------------------------------------------------------------------------------------------------------
+      10     47.7         33.7   207ms   650ms   926ms    0.00%              0.0          8.1  CUMPLE
+      25     56.1         39.3   470ms  1150ms  1491ms    0.00%              0.0         21.1  CUMPLE
+      50     67.8         47.0   799ms  1576ms  1923ms    0.00%             20.0         28.7  CUMPLE
+      75     68.2         46.8  1134ms  2546ms  3464ms    0.00%             46.0         27.6  NO CUMPLE
+     100     49.5         34.4  2038ms  4917ms  5941ms    1.59%             71.0         28.8  NO CUMPLE
+     150     53.6         34.8  2716ms  6322ms  8300ms    6.97%            122.0         28.9  NO CUMPLE
+     200     59.1         32.9  4025ms  7435ms  9281ms   19.79%            171.0         28.9  NO CUMPLE
+     300     74.2         27.1  5170ms  8177ms 10324ms   46.34%            268.0         28.1  NO CUMPLE
+
+TPS MÁXIMO SOSTENIDO (cumpliendo el SLO): 47.0 transferencias/s (67.8 peticiones/s en total) con 50 usuarios simultáneos
+   latencia de transferencias en ese punto: p50 799 ms | p95 1576 ms | p99 1923 ms | errores 0.00%
+TPS PICO (aunque ya sin cumplir el SLO): 27.1 transferencias/s con 300 usuarios (p95 8177 ms)

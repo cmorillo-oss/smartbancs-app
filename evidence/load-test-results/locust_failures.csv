@@ -1,0 +1,9 @@
+Method,Name,Error,Occurrences
+GET,GET /accounts/[n]/transactions,RemoteDisconnected('Remote end closed connection without response'),1
+POST,POST /transactions,"CatchResponseError('HTTP 503: {""error_code"":""POOL_TIMEOUT"",""message"":""no hay conexiones disponibles en el pool')",754
+GET,GET /accounts/[n],RemoteDisconnected('Remote end closed connection without response'),4
+GET,GET /accounts/[n],HTTPError('500 Server Error: Internal Server Error for url: GET /accounts/[n]'),169
+GET,GET /accounts/[n],"ConnectionResetError(104, 'Connection reset by peer')",17
+GET,GET /accounts/[n]/transactions,HTTPError('500 Server Error: Internal Server Error for url: GET /accounts/[n]/transactions'),62
+GET,GET /accounts/[n]/transactions,"ConnectionResetError(104, 'Connection reset by peer')",13
+POST,POST /transactions,CatchResponseError('HTTP 0: '),80

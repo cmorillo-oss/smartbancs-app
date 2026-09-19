@@ -75,20 +75,57 @@ BANCS_SYNC_DURATION = Histogram(
 AI_CIRCUIT_BREAKER_STATE.set(0)
 
 
+# Peticiones que AHORA MISMO esperan una conexión del pool (ver install_pool_waiter_tracking).
+_pool_waiters = 0
+
+
+def pool_waiting() -> int:
+    return _pool_waiters
+
+
+def pool_snapshot(engine) -> dict:
+    """Estado del pool en este instante (lo usan la métrica, /ready y el endpoint de diagnóstico)."""
+    pool = engine.sync_engine.pool
+    size, overflow = pool.size(), max(0, pool.overflow())
+    capacity = size + pool._max_overflow  # tope real de conexiones: pool_size + max_overflow
+    out = pool.checkedout()
+    return {"size": size, "checked_in": pool.checkedin(), "checked_out": out, "overflow": overflow,
+            "capacity": capacity, "waiting": _pool_waiters, "utilization": round(out / capacity, 3) if capacity else 0.0,
+            "pool_timeout_s": pool._timeout}
+
+
+def install_pool_waiter_tracking(engine) -> None:
+    """Cuenta cuántas peticiones están BLOQUEADAS esperando una conexión libre.
+
+    SQLAlchemy no expone este dato, pero es LA señal del agotamiento del pool: con "checked_out" al
+    máximo solo sabemos que el pool está lleno, no cuánta gente hace cola detrás. Envolvemos el punto
+    donde el pool entrega (o hace esperar por) una conexión. Si hay conexión libre el contador sube y
+    baja en microsegundos; bajo saturación las peticiones se quedan ahí hasta pool_timeout, y eso es
+    lo que se ve en la métrica.
+    """
+    pool = engine.sync_engine.pool
+    original = pool._do_get
+
+    def tracked():
+        global _pool_waiters
+        _pool_waiters += 1
+        try:
+            return original()
+        finally:
+            _pool_waiters -= 1
+
+    pool._do_get = tracked
+
+
 def register_pool_gauge(engine) -> None:
     """Expone el estado del pool SIN un hilo de sondeo.
 
     POR QUÉ set_function: Prometheus llama a la función en cada scrape, así que el valor es
     siempre el del instante de la lectura y no gastamos CPU entre scrapes.
-    Nota: "waiting" (peticiones en cola esperando conexión) no lo expone SQLAlchemy;
-    se añadirá en la Fase 7, cuando se reproduzca el agotamiento del pool.
     """
-    pool = engine.sync_engine.pool
-    DB_POOL_CONNECTIONS.labels(state="size").set_function(lambda: pool.size())
-    DB_POOL_CONNECTIONS.labels(state="checked_in").set_function(lambda: pool.checkedin())
-    DB_POOL_CONNECTIONS.labels(state="checked_out").set_function(lambda: pool.checkedout())
-    # overflow() es negativo mientras no se usa el overflow (parte de -pool_size); lo acotamos a 0.
-    DB_POOL_CONNECTIONS.labels(state="overflow").set_function(lambda: max(0, pool.overflow()))
+    install_pool_waiter_tracking(engine)
+    for state in ("size", "checked_in", "checked_out", "overflow", "waiting", "capacity"):
+        DB_POOL_CONNECTIONS.labels(state=state).set_function(lambda st=state: pool_snapshot(engine)[st])
 
 
 _KNOWN_OPS = {"select", "insert", "update", "delete", "begin", "commit", "rollback", "set"}

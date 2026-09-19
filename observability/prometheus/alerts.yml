@@ -1,0 +1,87 @@
+# Alertas de SmartBancs (Fase 7). Cada regla responde a un síntoma del incidente descrito en el reto
+# y enlaza con el endpoint de diagnóstico que dice QUÉ pasa. Las probamos con series sintéticas en
+# alerts_test.yml (promtool test rules): así sabemos que disparan cuando deben, no solo que "parsean".
+#
+# Los "for:" son cortos a propósito para que la demo sea visible; en producción se ajustarían al ruido real.
+groups:
+  - name: smartbancs-sla
+    rules:
+      # El reto exige transferencias < 2 s. p95 (no la media): la media esconde a los clientes que peor lo pasan.
+      - alert: TransferLatencyP95High
+        expr: |
+          histogram_quantile(0.95,
+            sum by (le) (rate(smartbancs_transaction_duration_seconds_bucket{operation="transfer"}[1m]))) > 2
+        for: 30s
+        labels: {severity: critical}
+        annotations:
+          summary: "p95 de transferencias por encima de 2 s ({{ $value | humanizeDuration }})"
+          runbook: "Ver /api/v1/admin/diagnostics/pool y /locks: ¿pool agotado o bloqueos?"
+
+      # Errores TÉCNICOS (bloqueo, timeout, pool). Se excluyen los errores de negocio (saldo insuficiente,
+      # cuenta inexistente...): son respuestas correctas del sistema, no fallos, y dispararían falsas alarmas.
+      - alert: TransferErrorRateHigh
+        expr: |
+          sum(rate(smartbancs_transaction_errors_total{error_code!~"INSUFFICIENT_FUNDS|ACCOUNT_NOT_FOUND|ACCOUNT_NOT_ACTIVE|CURRENCY_MISMATCH|IDEMPOTENCY_KEY_CONFLICT"}[1m]))
+            /
+          (sum(rate(smartbancs_transactions_total{status="COMPLETED"}[1m])) + sum(rate(smartbancs_transaction_errors_total[1m])) > 0) > 0.01
+        for: 30s
+        labels: {severity: critical}
+        annotations:
+          summary: "Más del 1% de las transferencias fallan por causas técnicas ({{ $value | humanizePercentage }})"
+          runbook: "Ver error_code en smartbancs_transaction_errors_total: LOCK_TIMEOUT / POOL_TIMEOUT / DEADLOCK_RETRY_EXHAUSTED."
+
+  - name: smartbancs-database
+    rules:
+      # Con el orden determinista de bloqueo NO debería haber ninguno: cualquiera indica que algún código
+      # nuevo no respeta el orden (ADR 0003). Por eso el umbral es "> 0", sin margen.
+      - alert: DatabaseDeadlockDetected
+        expr: increase(smartbancs_db_deadlocks_total[5m]) > 0
+        labels: {severity: critical}
+        annotations:
+          summary: "PostgreSQL detectó {{ $value }} deadlock(s) en 5 min"
+          runbook: "Buscar 'deadlock_detected' en los logs (trae ambas cuentas, la consulta y el trace_id)."
+
+      # Peticiones haciendo cola por una conexión: el síntoma directo de "timeouts de conexión con la BD".
+      # max_over_time (30 s) y no el valor instantáneo: en un incidente real la cola OSCILA (llegan oleadas de
+      # peticiones y se liberan por timeout); con el valor instantáneo la alerta "parpadeaba" a cero entre
+      # oleadas y NUNCA llegaba a disparar (observado al reproducir el incidente).
+      - alert: DatabasePoolExhausted
+        expr: max_over_time(smartbancs_db_pool_connections{state="waiting"}[30s]) > 0
+        for: 15s
+        labels: {severity: critical}
+        annotations:
+          summary: "{{ $value }} peticiones esperando una conexión del pool"
+          runbook: "GET /api/v1/admin/diagnostics/blocking-tree: casi siempre hay una transacción larga reteniendo un bloqueo."
+
+      # Aviso temprano: el pool ya está casi lleno aunque aún nadie espere.
+      - alert: DatabasePoolNearlyFull
+        expr: smartbancs_db_pool_connections{state="checked_out"} / smartbancs_db_pool_connections{state="capacity"} > 0.9
+        for: 30s
+        labels: {severity: warning}
+        annotations:
+          summary: "Pool de conexiones al {{ $value | humanizePercentage }}"
+
+  - name: smartbancs-integrations
+    rules:
+      # "Atascado" = hay cola y NO baja. Una cola grande que se vacía es normal (tras una caída de Bancs o de la IA).
+      - alert: OutboxStuck
+        expr: smartbancs_outbox_pending_events > 500 and delta(smartbancs_outbox_pending_events[2m]) >= 0
+        for: 2m
+        labels: {severity: critical}
+        annotations:
+          summary: "El outbox tiene {{ $value }} eventos pendientes y no baja"
+          runbook: "¿Circuito hacia Bancs/IA abierto? Ver smartbancs_bancs_circuit_breaker_state y smartbancs_ai_circuit_breaker_state."
+
+      - alert: BancsCircuitOpen
+        expr: smartbancs_bancs_circuit_breaker_state == 1
+        for: 1m
+        labels: {severity: warning}
+        annotations:
+          summary: "El circuito hacia Bancs lleva abierto más de 1 minuto"
+
+      - alert: AiCircuitOpen
+        expr: smartbancs_ai_circuit_breaker_state == 1
+        for: 1m
+        labels: {severity: warning}
+        annotations:
+          summary: "El circuito hacia la IA lleva abierto más de 1 minuto (las transferencias NO se ven afectadas)"

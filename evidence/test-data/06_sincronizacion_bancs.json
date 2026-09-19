@@ -7,16 +7,16 @@
   },
   "saldos_finales": [
     {
-      "cuenta": "BS-fc30e250-00",
+      "cuenta": "BS-51c2dd59-00",
       "local": "950.00",
       "bancs": "950.00"
     },
     {
-      "cuenta": "BS-fc30e250-01",
+      "cuenta": "BS-51c2dd59-01",
       "local": "1050.00",
       "bancs": "1050.00"
     }
   ],
   "eventos_sin_enviar": 0,
-  "lotes_exitosos_en_bancs_sync_log": 18
+  "lotes_exitosos_en_bancs_sync_log": 115
 }

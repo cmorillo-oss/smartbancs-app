@@ -1,7 +1,7 @@
 {
   "transfers": 200,
   "accounts": 20,
-  "elapsed_seconds": 15.787,
+  "elapsed_seconds": 12.866,
   "http_status_counts": {
     "201": 200
   },

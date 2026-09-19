@@ -1,0 +1,149 @@
+# Pruebas unitarias de las alertas: `promtool test rules alerts_test.yml`.
+# Se inyectan series sintéticas y se comprueba QUÉ alertas están activas en cada instante:
+# tanto que disparan cuando deben como que NO disparan cuando todo está sano.
+rule_files:
+  - alerts.yml
+evaluation_interval: 15s
+
+tests:
+  # ---- Latencia: 100% de las transferencias tardan entre 2 y 5 s => p95 > 2 s ----
+  - name: p95 alto dispara, p95 sano no
+    interval: 15s
+    input_series:
+      # contadores acumulados por bucket (le): 10 transferencias/15s, todas en el bucket (2, 5]
+      - series: 'smartbancs_transaction_duration_seconds_bucket{operation="transfer", le="2"}'
+        values: '0+0x20'
+      - series: 'smartbancs_transaction_duration_seconds_bucket{operation="transfer", le="5"}'
+        values: '0+10x20'
+      - series: 'smartbancs_transaction_duration_seconds_bucket{operation="transfer", le="+Inf"}'
+        values: '0+10x20'
+    alert_rule_test:
+      - eval_time: 5m
+        alertname: TransferLatencyP95High
+        exp_alerts:
+          - exp_labels: {severity: critical}
+            exp_annotations:
+              summary: "p95 de transferencias por encima de 2 s (4.85s)"
+              runbook: "Ver /api/v1/admin/diagnostics/pool y /locks: ¿pool agotado o bloqueos?"
+
+  - name: latencia sana no dispara
+    interval: 15s
+    input_series:
+      - series: 'smartbancs_transaction_duration_seconds_bucket{operation="transfer", le="0.1"}'
+        values: '0+10x20'
+      - series: 'smartbancs_transaction_duration_seconds_bucket{operation="transfer", le="2"}'
+        values: '0+10x20'
+      - series: 'smartbancs_transaction_duration_seconds_bucket{operation="transfer", le="+Inf"}'
+        values: '0+10x20'
+    alert_rule_test:
+      - eval_time: 5m
+        alertname: TransferLatencyP95High
+        exp_alerts: []
+
+  # ---- Errores técnicos: 5 LOCK_TIMEOUT por cada 45 completadas (10%) ----
+  - name: tasa de error tecnico > 1% dispara
+    interval: 15s
+    input_series:
+      - series: 'smartbancs_transactions_total{status="COMPLETED", currency="USD"}'
+        values: '0+45x20'
+      - series: 'smartbancs_transaction_errors_total{error_code="LOCK_TIMEOUT"}'
+        values: '0+5x20'
+    alert_rule_test:
+      - eval_time: 5m
+        alertname: TransferErrorRateHigh
+        exp_alerts:
+          - exp_labels: {severity: critical}
+            exp_annotations:
+              summary: "Más del 1% de las transferencias fallan por causas técnicas (10%)"
+              runbook: "Ver error_code en smartbancs_transaction_errors_total: LOCK_TIMEOUT / POOL_TIMEOUT / DEADLOCK_RETRY_EXHAUSTED."
+
+  - name: errores de NEGOCIO (saldo insuficiente) no disparan la alerta técnica
+    interval: 15s
+    input_series:
+      - series: 'smartbancs_transactions_total{status="COMPLETED", currency="USD"}'
+        values: '0+10x20'
+      - series: 'smartbancs_transaction_errors_total{error_code="INSUFFICIENT_FUNDS"}'
+        values: '0+90x20'
+    alert_rule_test:
+      - eval_time: 5m
+        alertname: TransferErrorRateHigh
+        exp_alerts: []
+
+  # ---- Deadlocks ----
+  - name: cualquier deadlock dispara
+    interval: 15s
+    input_series:
+      - series: 'smartbancs_db_deadlocks_total'
+        values: '0 0 0 1 1 1 1 1 1 1'
+    alert_rule_test:
+      - eval_time: 2m
+        alertname: DatabaseDeadlockDetected
+        exp_alerts:
+          - exp_labels: {severity: critical}
+            exp_annotations:
+              summary: "PostgreSQL detectó 1 deadlock(s) en 5 min"
+              runbook: "Buscar 'deadlock_detected' en los logs (trae ambas cuentas, la consulta y el trace_id)."
+
+  - name: sin deadlocks no dispara
+    interval: 15s
+    input_series:
+      - series: 'smartbancs_db_deadlocks_total'
+        values: '0x20'
+    alert_rule_test:
+      - eval_time: 5m
+        alertname: DatabaseDeadlockDetected
+        exp_alerts: []
+
+  # ---- Pool agotado: cola que OSCILA (llega en oleadas y baja a 0 entre ellas) ----
+  - name: pool agotado dispara aunque la cola oscile entre oleadas
+    interval: 5s
+    input_series:
+      - series: 'smartbancs_db_pool_connections{state="waiting"}'
+        # oleadas: 0 -> 150 -> 0 -> 150 ... (el caso real que el valor instantáneo NO detectaba)
+        values: '0 0 150 0 150 0 150 0 150 0 150 0'
+    alert_rule_test:
+      - eval_time: 10s
+        alertname: DatabasePoolExhausted
+        exp_alerts: []          # aún dentro del "for: 15s"
+      - eval_time: 55s
+        alertname: DatabasePoolExhausted
+        exp_alerts:
+          - exp_labels: {severity: critical, state: waiting}
+            exp_annotations:
+              summary: "150 peticiones esperando una conexión del pool"
+              runbook: "GET /api/v1/admin/diagnostics/blocking-tree: casi siempre hay una transacción larga reteniendo un bloqueo."
+
+  - name: pool sano (cola siempre en 0) no dispara
+    interval: 5s
+    input_series:
+      - series: 'smartbancs_db_pool_connections{state="waiting"}'
+        values: '0x20'
+    alert_rule_test:
+      - eval_time: 90s
+        alertname: DatabasePoolExhausted
+        exp_alerts: []
+
+  # ---- Outbox atascado: cola grande que NO baja ----
+  - name: outbox que no baja dispara
+    interval: 15s
+    input_series:
+      - series: 'smartbancs_outbox_pending_events'
+        values: '600+10x30'
+    alert_rule_test:
+      - eval_time: 6m
+        alertname: OutboxStuck
+        exp_alerts:
+          - exp_labels: {severity: critical}
+            exp_annotations:
+              summary: "El outbox tiene 840 eventos pendientes y no baja"
+              runbook: "¿Circuito hacia Bancs/IA abierto? Ver smartbancs_bancs_circuit_breaker_state y smartbancs_ai_circuit_breaker_state."
+
+  - name: outbox grande pero que se vacia NO dispara (recuperacion normal)
+    interval: 15s
+    input_series:
+      - series: 'smartbancs_outbox_pending_events'
+        values: '3000-100x30'
+    alert_rule_test:
+      - eval_time: 6m
+        alertname: OutboxStuck
+        exp_alerts: []

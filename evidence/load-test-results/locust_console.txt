@@ -1,0 +1,88 @@
+[2026-09-19 03:37:41,715] 04323bc6c5d6/INFO/locust.main: Starting Locust 2.32.4
+[2026-09-19 03:37:41,738] 04323bc6c5d6/INFO/locust.runners: Shape test starting.
+[2026-09-19 03:37:41,761] 04323bc6c5d6/INFO/locust.runners: Shape worker starting
+[2026-09-19 03:37:41,762] 04323bc6c5d6/INFO/locust.runners: Shape test updating to 10 users at 1000.00 spawn rate
+[2026-09-19 03:37:41,763] 04323bc6c5d6/WARNING/locust.runners: Your selected spawn rate is very high (>100), and this is known to sometimes cause issues. Do you really need to ramp up that fast?
+[2026-09-19 03:37:41,764] 04323bc6c5d6/INFO/locust.runners: Ramping to 10 users at a rate of 1000.00 per second
+[2026-09-19 03:37:41,780] 04323bc6c5d6/INFO/locust.runners: All users spawned: {"BankUser": 10} (10 total users)
+[2026-09-19 03:38:07,212] 04323bc6c5d6/INFO/locust.runners: Shape test updating to 25 users at 1000.00 spawn rate
+[2026-09-19 03:38:07,213] 04323bc6c5d6/WARNING/locust.runners: Your selected spawn rate is very high (>100), and this is known to sometimes cause issues. Do you really need to ramp up that fast?
+[2026-09-19 03:38:07,215] 04323bc6c5d6/INFO/locust.runners: Ramping to 25 users at a rate of 1000.00 per second
+[2026-09-19 03:38:07,227] 04323bc6c5d6/INFO/locust.runners: All users spawned: {"BankUser": 25} (25 total users)
+[2026-09-19 03:38:32,679] 04323bc6c5d6/INFO/locust.runners: Shape test updating to 50 users at 1000.00 spawn rate
+[2026-09-19 03:38:32,680] 04323bc6c5d6/WARNING/locust.runners: Your selected spawn rate is very high (>100), and this is known to sometimes cause issues. Do you really need to ramp up that fast?
+[2026-09-19 03:38:32,690] 04323bc6c5d6/INFO/locust.runners: Ramping to 50 users at a rate of 1000.00 per second
+[2026-09-19 03:38:32,709] 04323bc6c5d6/INFO/locust.runners: All users spawned: {"BankUser": 50} (50 total users)
+[2026-09-19 03:38:57,094] 04323bc6c5d6/INFO/locust.runners: Shape test updating to 75 users at 1000.00 spawn rate
+[2026-09-19 03:38:57,096] 04323bc6c5d6/WARNING/locust.runners: Your selected spawn rate is very high (>100), and this is known to sometimes cause issues. Do you really need to ramp up that fast?
+[2026-09-19 03:38:57,098] 04323bc6c5d6/INFO/locust.runners: Ramping to 75 users at a rate of 1000.00 per second
+[2026-09-19 03:38:57,132] 04323bc6c5d6/INFO/locust.runners: All users spawned: {"BankUser": 75} (75 total users)
+[2026-09-19 03:39:21,774] 04323bc6c5d6/INFO/locust.runners: Shape test updating to 100 users at 1000.00 spawn rate
+[2026-09-19 03:39:21,774] 04323bc6c5d6/WARNING/locust.runners: Your selected spawn rate is very high (>100), and this is known to sometimes cause issues. Do you really need to ramp up that fast?
+[2026-09-19 03:39:21,775] 04323bc6c5d6/INFO/locust.runners: Ramping to 100 users at a rate of 1000.00 per second
+[2026-09-19 03:39:21,787] 04323bc6c5d6/INFO/locust.runners: All users spawned: {"BankUser": 100} (100 total users)
+[2026-09-19 03:39:47,311] 04323bc6c5d6/INFO/locust.runners: Shape test updating to 150 users at 1000.00 spawn rate
+[2026-09-19 03:39:47,311] 04323bc6c5d6/WARNING/locust.runners: Your selected spawn rate is very high (>100), and this is known to sometimes cause issues. Do you really need to ramp up that fast?
+[2026-09-19 03:39:47,318] 04323bc6c5d6/INFO/locust.runners: Ramping to 150 users at a rate of 1000.00 per second
+[2026-09-19 03:39:47,339] 04323bc6c5d6/INFO/locust.runners: All users spawned: {"BankUser": 150} (150 total users)
+[2026-09-19 03:40:11,794] 04323bc6c5d6/INFO/locust.runners: Shape test updating to 200 users at 1000.00 spawn rate
+[2026-09-19 03:40:11,794] 04323bc6c5d6/WARNING/locust.runners: Your selected spawn rate is very high (>100), and this is known to sometimes cause issues. Do you really need to ramp up that fast?
+[2026-09-19 03:40:11,796] 04323bc6c5d6/INFO/locust.runners: Ramping to 200 users at a rate of 1000.00 per second
+[2026-09-19 03:40:11,820] 04323bc6c5d6/INFO/locust.runners: All users spawned: {"BankUser": 200} (200 total users)
+[2026-09-19 03:40:37,525] 04323bc6c5d6/INFO/locust.runners: Shape test updating to 300 users at 1000.00 spawn rate
+[2026-09-19 03:40:37,525] 04323bc6c5d6/WARNING/locust.runners: Your selected spawn rate is very high (>100), and this is known to sometimes cause issues. Do you really need to ramp up that fast?
+[2026-09-19 03:40:37,525] 04323bc6c5d6/INFO/locust.runners: Ramping to 300 users at a rate of 1000.00 per second
+[2026-09-19 03:40:37,543] 04323bc6c5d6/INFO/locust.runners: All users spawned: {"BankUser": 300} (300 total users)
+[2026-09-19 03:41:02,233] 04323bc6c5d6/INFO/locust.runners: Shape test stopping
+
+PRUEBA DE CARGA: rampa por escalones (bucle cerrado, sin pausas entre peticiones)
+======================================================================================================================
+5000 cuentas distintas | mezcla 70% transferencias / 20% saldo / 10% historial | SLO: p95 < 2000 ms y errores < 1%
+
+Usuarios    Req/s  TPS transf.     p50     p95     p99  % error  cola pool (máx)  pool en uso  SLO
+----------------------------------------------------------------------------------------------------------------------
+      10     47.7         33.7   207ms   650ms   926ms    0.00%              0.0          8.1  CUMPLE
+      25     56.1         39.3   470ms  1150ms  1491ms    0.00%              0.0         21.1  CUMPLE
+      50     67.8         47.0   799ms  1576ms  1923ms    0.00%             20.0         28.7  CUMPLE
+      75     68.2         46.8  1134ms  2546ms  3464ms    0.00%             46.0         27.6  NO CUMPLE
+     100     49.5         34.4  2038ms  4917ms  5941ms    1.59%             71.0         28.8  NO CUMPLE
+     150     53.6         34.8  2716ms  6322ms  8300ms    6.97%            122.0         28.9  NO CUMPLE
+     200     59.1         32.9  4025ms  7435ms  9281ms   19.79%            171.0         28.9  NO CUMPLE
+     300     74.2         27.1  5170ms  8177ms 10324ms   46.34%            268.0         28.1  NO CUMPLE
+
+TPS MÁXIMO SOSTENIDO (cumpliendo el SLO): 47.0 transferencias/s (67.8 peticiones/s en total) con 50 usuarios simultáneos
+   latencia de transferencias en ese punto: p50 799 ms | p95 1576 ms | p99 1923 ms | errores 0.00%
+TPS PICO (aunque ya sin cumplir el SLO): 27.1 transferencias/s con 300 usuarios (p95 8177 ms)
+[2026-09-19 03:41:02,725] 04323bc6c5d6/INFO/locust.main: --run-time limit reached, shutting down
+[2026-09-19 03:41:03,013] 04323bc6c5d6/INFO/locust.main: writing html report to file: /evidence/load-test-results/locust_report.html
+[2026-09-19 03:41:03,035] 04323bc6c5d6/INFO/locust.main: Shutting down (exit code 1)
+Type     Name                                                                          # reqs      # fails |    Avg     Min     Max    Med |   req/s  failures/s
+--------|----------------------------------------------------------------------------|-------|-------------|-------|-------|-------|-------|--------|-----------
+GET      GET /accounts/[n]                                                               2375   191(8.04%) |   1309       1    8216    490 |   11.83        0.95
+GET      GET /accounts/[n]/transactions                                                  1178    78(6.62%) |   1257       3    8422    480 |    5.87        0.39
+POST     POST /transactions                                                              8213  840(10.23%) |   2108       1   11073   1200 |   40.90        4.18
+--------|----------------------------------------------------------------------------|-------|-------------|-------|-------|-------|-------|--------|-----------
+         Aggregated                                                                     11766  1109(9.43%) |   1862       1   11073   1000 |   58.59        5.52
+
+Response time percentiles (approximated)
+Type     Name                                                                                  50%    66%    75%    80%    90%    95%    98%    99%  99.9% 99.99%   100% # reqs
+--------|--------------------------------------------------------------------------------|--------|------|------|------|------|------|------|------|------|------|------|------
+GET      GET /accounts/[n]                                                                     490   1100   1900   2500   4100   5200   5400   5600   8100   8200   8200   2375
+GET      GET /accounts/[n]/transactions                                                        480   1100   1800   2400   3500   5200   5400   5700   6900   8400   8400   1178
+POST     POST /transactions                                                                   1200   2300   3300   3800   5200   5800   7500   8300  10000  11000  11000   8213
+--------|--------------------------------------------------------------------------------|--------|------|------|------|------|------|------|------|------|------|------|------
+         Aggregated                                                                           1000   1900   2800   3400   5200   5500   6900   8100  10000  11000  11000  11766
+
+Error report
+------------------|---------------------------------------------------------------------------------------------------------------------------------------------
+760                POST POST /transactions: HTTP 503: {"error_code":"POOL_TIMEOUT","message":"no hay conexiones disponibles en el pool
+170                GET GET /accounts/[n]: HTTPError('500 Server Error: Internal Server Error for url: GET /accounts/[n]')
+80                 POST POST /transactions: HTTP 0:                                                                    
+64                 GET GET /accounts/[n]/transactions: HTTPError('500 Server Error: Internal Server Error for url: GET /accounts/[n]/transactions')
+13                 GET GET /accounts/[n]/transactions: ConnectionResetError(104, 'Connection reset by peer')           
+17                 GET GET /accounts/[n]: ConnectionResetError(104, 'Connection reset by peer')                        
+4                  GET GET /accounts/[n]: RemoteDisconnected('Remote end closed connection without response')          
+1                  GET GET /accounts/[n]/transactions: RemoteDisconnected('Remote end closed connection without response')
+------------------|---------------------------------------------------------------------------------------------------------------------------------------------
+
+

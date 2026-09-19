@@ -1,0 +1,66 @@
+{
+  "unsafe": {
+    "launched": 30,
+    "completed": 1,
+    "aborted_by_deadlock": 29,
+    "postgres_deadlocks": 29,
+    "seconds": 2.1,
+    "sample_events": [
+      {
+        "event": "deadlock_detected",
+        "level": "error",
+        "trace_id": "e1c0d620a2c844709d50ede4f823fbb2",
+        "sqlstate": "40P01",
+        "pid": 597,
+        "accounts": [
+          "DLU-534cfdbb-00",
+          "DLU-534cfdbb-01"
+        ],
+        "holding": null,
+        "waiting_for": "DLU-534cfdbb-00",
+        "query": "SELECT id, balance FROM accounts WHERE id = $1 FOR UPDATE  -- id=25 (DLU-534cfdbb-00)",
+        "wait_seconds": 1.02,
+        "detail": "Process 597 waits for ShareLock on transaction 872; blocked by process 608. | Process 608 waits for AccessExclusiveLock on tuple (1,42) of relation 16386 of database 16384; blocked by process 615. | Process 615 waits for ShareLock on transaction 873; blocked by process 623. | Process 623 waits for AccessExclusiveLock on tuple (1,41) of relation 16386 of database 16384; blocked by process 597."
+      },
+      {
+        "event": "deadlock_detected",
+        "level": "error",
+        "trace_id": "9029f4931800420993a24f60ebf55e6f",
+        "sqlstate": "40P01",
+        "pid": 615,
+        "accounts": [
+          "DLU-534cfdbb-01",
+          "DLU-534cfdbb-00"
+        ],
+        "holding": null,
+        "waiting_for": "DLU-534cfdbb-01",
+        "query": "SELECT id, balance FROM accounts WHERE id = $1 FOR UPDATE  -- id=26 (DLU-534cfdbb-01)",
+        "wait_seconds": 1.022,
+        "detail": "Process 615 waits for ShareLock on transaction 873; blocked by process 623. | Process 623 waits for AccessExclusiveLock on tuple (1,41) of relation 16386 of database 16384; blocked by process 603. | Process 603 waits for ShareLock on transaction 872; blocked by process 608. | Process 608 waits for AccessExclusiveLock on tuple (1,42) of relation 16386 of database 16384; blocked by process 615."
+      },
+      {
+        "event": "deadlock_detected",
+        "level": "error",
+        "trace_id": "5b0c8060fedc4dba87da2ca0461abaf5",
+        "sqlstate": "40P01",
+        "pid": 607,
+        "accounts": [
+          "DLU-534cfdbb-00",
+          "DLU-534cfdbb-01"
+        ],
+        "holding": null,
+        "waiting_for": "DLU-534cfdbb-00",
+        "query": "SELECT id, balance FROM accounts WHERE id = $1 FOR UPDATE  -- id=25 (DLU-534cfdbb-00)",
+        "wait_seconds": 1.022,
+        "detail": "Process 607 waits for AccessExclusiveLock on tuple (1,41) of relation 16386 of database 16384; blocked by process 603. | Process 603 waits for ShareLock on transaction 872; blocked by process 608. | Process 608 waits for AccessExclusiveLock on tuple (1,42) of relation 16386 of database 16384; blocked by process 615. | Process 615 waits for ShareLock on transaction 873; blocked by process 623. | Process 623 waits for AccessExclusiveLock on tuple (1,41) of relation 16386 of database 16384; blocked by process 607."
+      }
+    ]
+  },
+  "safe": {
+    "launched": 30,
+    "completed": 30,
+    "postgres_deadlocks": 0,
+    "api_metric_deadlocks": 0.0,
+    "seconds": 1.78
+  }
+}

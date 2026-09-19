@@ -1,0 +1,30 @@
+==============================================================================
+INCIDENTE: agotamiento del pool por una transacción larga que bloquea una fila caliente
+==============================================================================
+[t=0] Estado sano: /ready -> HTTP 200 {'status': 'ready', 'database': 'connected'} | capacidad del pool: 30 conexiones
+[t=0] Sesión culpable (pid 4200) bloquea la cuenta INC-c2712b33-00 y no termina su transacción.
+[t= 1.0s] pool en uso   30/30 | esperando conexión   20 | /ready -> HTTP 503 (pool_exhausted) en 1098 ms
+[t= 3.9s] pool en uso   30/30 | esperando conexión  120 | /ready -> HTTP 503 (pool_exhausted) en 1188 ms
+[t= 7.1s] pool en uso   30/30 | esperando conexión  174 | /ready -> HTTP 503 (pool_exhausted) en 2657 ms
+[t=14.6s] pool en uso   24/30 | esperando conexión    0 | /ready -> HTTP 200 (connected) en 862 ms
+[t=22.2s] pool en uso   30/30 | esperando conexión    0 | /ready -> HTTP 503 (pool_exhausted) en 2025 ms
+[t=31.9s] pool en uso   30/30 | esperando conexión  103 | /ready -> HTTP 200 (connected) en 2565 ms
+[t=43.6s] pool en uso   30/30 | esperando conexión   24 | /ready -> HTTP 503 (pool_exhausted) en 2147 ms
+
+--- QUÉ VIO EL CLIENTE durante el incidente (resultados de las transferencias) ---
+    1203  (74.0%)  503:LOCK_TIMEOUT
+     422  (26.0%)  503:POOL_TIMEOUT
+
+--- DETECCIÓN ---
+  Pico de peticiones esperando conexión (métrica pool{state="waiting"}): 174
+  /ready detectó la degradación (HTTP 503) a los 1.0 s
+  Endpoint /diagnostics/blocking-tree identificó al culpable a los 1.0 s (consulta: 554 ms)
+    -> pid 4200 (incident-simulator, idle in transaction) bloquea a 30 sesión(es); su última consulta: SELECT 1 FROM accounts WHERE id = $1 FOR UPDATE
+  Endpoint /diagnostics/pool: POOL AGOTADO: 95 peticiones esperando conexión (30/30 en uso)
+  Alertas de Prometheus (segundo del incidente en que pasaron a pending / firing):
+    DatabasePoolExhausted        pending a los 7.1 s  |  firing a los 22.2 s
+    TransferErrorRateHigh        pending a los 14.6 s  |  firing a los 43.6 s
+    TransferLatencyP95High       pending a los 14.6 s  |  firing a los 43.6 s
+
+--- RECUPERACIÓN ---
+  Al liberar el bloqueo, el sistema volvió a estado sano en 0.0 s (/ready = 200 y sin peticiones en cola)

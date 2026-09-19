@@ -1,0 +1,27 @@
+==============================================================================
+DEMO DE DEADLOCK: la misma carga cruzada (A->B y B->A a la vez), dos formas de bloquear
+==============================================================================
+
+                                      INSEGURO (orden invertido)  SEGURO (orden por id, API)
+------------------------------------------------------------------------------
+Transferencias lanzadas a la vez      30                          30                        
+Completadas                           1                           30                        
+Abortadas por deadlock                29                          0                         
+Deadlocks según PostgreSQL            29                          0                         
+Deadlocks según la API (métrica)      (no pasa por la API)        0                         
+Espera de la víctima hasta el error   1.11 s (media)              -                         
+Duración total                        2.10 s                      1.78 s                    
+------------------------------------------------------------------------------
+Veredicto                             DEADLOCKS                   CERO DEADLOCKS            
+
+--- DETALLE DE UN DEADLOCK REAL (lo que vería el operador) ---
+  Error ............ SQLSTATE 40P01 (deadlock_detected)
+  trace_id ......... e8d9b9c17e3d495dae02a3b4ae8f7e99
+  Cuentas .......... la víctima tenía bloqueada DLU-534cfdbb-00 y pedía DLU-534cfdbb-01
+  Espera ........... 1.004 s hasta que Postgres detectó el ciclo (deadlock_timeout = 1 s)
+  Consulta víctima . SELECT id, balance FROM accounts WHERE id = $1 FOR UPDATE  -- id=26 (DLU-534cfdbb-01)
+  Detalle Postgres . Process 608 waits for AccessExclusiveLock on tuple (1,42) of relation 16386 of database 16384; blocked by process 619. | Process 619 waits for ShareLock on transaction 873; blocked by process 623. | Process 623 waits for AccessExclusiveLock on tuple (1,41) of relation 16386 of database 16384; blocked by process 603. | Process 603 waits for ShareLock on transaction 872; blocked by process 608.
+  Procesos en el ciclo: [608, 619, 623, 603]  (víctima = 608); cada uno espera el bloqueo que tiene el siguiente
+
+--- ASÍ SE REGISTRARÍA (log JSON estructurado con trace_id) ---
+  {"event": "deadlock_detected", "level": "error", "trace_id": "e8d9b9c17e3d495dae02a3b4ae8f7e99", "sqlstate": "40P01", "pid": 608, "accounts": ["DLU-534cfdbb-00", "DLU-534cfdbb-01"], "holding": "DLU-534cfdbb-00", "waiting_for": "DLU-534cfdbb-01", "query": "SELECT id, balance FROM accounts WHERE id = $1 FOR UPDATE  -- id=26 (DLU-534cfdbb-01)", "wait_seconds": 1.004, "detail": "Process 608 waits for AccessExclusiveLock on tuple (1,42) of relation 16386 of database 16384; blocked by process 619. | Process 619 waits for ShareLock on transaction 873; blocked by process 623. | Process 623 waits for AccessExclusiveLock on tuple (1,41) of relation 16386 of database 16384; blocked by process 603. | Process 603 waits for ShareLock on transaction 872; blocked by process 608."}

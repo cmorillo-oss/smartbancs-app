@@ -85,6 +85,11 @@ class Settings(BaseSettings):
     reconciliation_max_accounts: int = 50
     reconciliation_concurrency: int = 2
 
+    # --- Diagnóstico e incidentes (Fase 7) ---
+    # /ready espera como máximo esto por una conexión. Si no la consigue, el pool está agotado o la BD
+    # va lentísima: la instancia se declara NO lista (503) para que el balanceador deje de enviarle tráfico.
+    ready_timeout_s: float = 1.0
+
     # --- Trazas (OpenTelemetry) ---
     # Vacío = los spans se generan (y dan span_id a los logs) pero NO se exportan.
     # POR QUÉ: así la API arranca sin depender de un colector; exportar es opt-in y un

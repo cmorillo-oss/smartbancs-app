@@ -1,0 +1,24 @@
+postgres-1  | 2026-09-19 02:58:08.826 UTC [437] STATEMENT:  SELECT id, balance FROM accounts WHERE id = $1 FOR UPDATE
+postgres-1  | 2026-09-19 02:58:08.826 UTC [437] ERROR:  deadlock detected
+postgres-1  | 2026-09-19 02:58:08.826 UTC [437] DETAIL:  Process 437 waits for ShareLock on transaction 789; blocked by process 435.
+postgres-1  | 	Process 435 waits for AccessExclusiveLock on tuple (0,38) of relation 16386 of database 16384; blocked by process 452.
+postgres-1  | 	Process 452 waits for ShareLock on transaction 790; blocked by process 451.
+postgres-1  | 	Process 451 waits for AccessExclusiveLock on tuple (0,37) of relation 16386 of database 16384; blocked by process 437.
+postgres-1  | 	Process 437: SELECT id, balance FROM accounts WHERE id = $1 FOR UPDATE
+postgres-1  | 	Process 435: SELECT id, balance FROM accounts WHERE id = $1 FOR UPDATE
+postgres-1  | 	Process 452: SELECT id, balance FROM accounts WHERE id = $1 FOR UPDATE
+postgres-1  | 	Process 451: SELECT id, balance FROM accounts WHERE id = $1 FOR UPDATE
+postgres-1  | 2026-09-19 02:58:08.826 UTC [437] HINT:  See server log for query details.
+--
+postgres-1  | 2026-09-19 02:58:08.832 UTC [439] STATEMENT:  SELECT id, balance FROM accounts WHERE id = $1 FOR UPDATE
+postgres-1  | 2026-09-19 02:58:08.832 UTC [439] ERROR:  deadlock detected
+postgres-1  | 2026-09-19 02:58:08.832 UTC [439] DETAIL:  Process 439 waits for AccessExclusiveLock on tuple (0,37) of relation 16386 of database 16384; blocked by process 446.
+postgres-1  | 	Process 446 waits for ShareLock on transaction 789; blocked by process 435.
+postgres-1  | 	Process 435 waits for AccessExclusiveLock on tuple (0,38) of relation 16386 of database 16384; blocked by process 452.
+postgres-1  | 	Process 452 waits for ShareLock on transaction 790; blocked by process 451.
+postgres-1  | 	Process 451 waits for AccessExclusiveLock on tuple (0,37) of relation 16386 of database 16384; blocked by process 439.
+postgres-1  | 	Process 439: SELECT id, balance FROM accounts WHERE id = $1 FOR UPDATE
+postgres-1  | 	Process 446: SELECT id, balance FROM accounts WHERE id = $1 FOR UPDATE
+postgres-1  | 	Process 435: SELECT id, balance FROM accounts WHERE id = $1 FOR UPDATE
+postgres-1  | 	Process 452: SELECT id, balance FROM accounts WHERE id = $1 FOR UPDATE
+--
