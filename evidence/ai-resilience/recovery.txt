@@ -1,0 +1,3 @@
+Estado final de los eventos ai.transaction_created:
+SENT|19409
+Recomendaciones almacenadas: 19409

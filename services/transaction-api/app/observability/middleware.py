@@ -52,6 +52,20 @@ class TraceMiddleware:
 
         start = time.perf_counter()
         status_code = 500  # si el endpoint revienta antes de responder, esto es lo que vio el cliente
+        finished = False
+
+        def log_finished() -> None:
+            nonlocal finished
+            if finished:
+                return
+            finished = True
+            getattr(log, level)(
+                "request_finished",
+                method=method,
+                path=path,
+                status_code=status_code,
+                duration_ms=round((time.perf_counter() - start) * 1000, 2),
+            )
 
         async def send_with_trace_header(message):
             nonlocal status_code
@@ -60,6 +74,12 @@ class TraceMiddleware:
                 # El cliente recibe el id para poder citarlo en un reporte de soporte.
                 message.setdefault("headers", []).append((b"x-trace-id", trace_id.encode()))
             await send(message)
+            # POR QUÉ medir aquí y no al terminar la app: las BackgroundTasks (notificación a la IA)
+            # se ejecutan DESPUÉS de enviar la respuesta pero DENTRO de la llamada a la app. Si
+            # cronometráramos al final, duration_ms incluiría los 300-800ms de la IA y mentiría sobre
+            # la latencia que el cliente realmente percibió (medido: 23ms reales vs 564ms "logueados").
+            if message["type"] == "http.response.body" and not message.get("more_body", False):
+                log_finished()
 
         try:
             await self.app(scope, receive, send_with_trace_header)
@@ -67,12 +87,5 @@ class TraceMiddleware:
             log.exception("request_failed", method=method, path=path)
             raise
         finally:
-            duration_ms = round((time.perf_counter() - start) * 1000, 2)
-            getattr(log, level)(
-                "request_finished",
-                method=method,
-                path=path,
-                status_code=status_code,
-                duration_ms=duration_ms,
-            )
+            log_finished()  # solo actúa si la respuesta nunca llegó a enviarse (error temprano)
             trace_id_var.reset(token)

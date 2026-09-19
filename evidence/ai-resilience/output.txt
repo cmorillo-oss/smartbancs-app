@@ -1,0 +1,418 @@
+ Image smartbancs_app-transaction-api Building 
+ Image smartbancs_app-ai-service Building 
+ Image smartbancs_app-outbox-worker Building 
+#1 [internal] load local bake definitions
+#1 reading from stdin 1.69kB 0.1s done
+#1 DONE 0.1s
+
+#2 [transaction-api internal] load build definition from Dockerfile
+#2 transferring dockerfile: 1.29kB 0.0s done
+#2 DONE 0.2s
+
+#3 [ai-service internal] load build definition from Dockerfile
+#3 transferring dockerfile: 642B 0.0s done
+#3 DONE 0.3s
+
+#4 [ai-service internal] load metadata for docker.io/library/python:3.11-slim
+#4 DONE 1.1s
+
+#5 [ai-service internal] load .dockerignore
+#5 transferring context: 58B 0.0s done
+#5 DONE 0.0s
+
+#6 [outbox-worker internal] load .dockerignore
+#6 transferring context: 58B 0.0s done
+#6 DONE 0.1s
+
+#7 [ai-service internal] load build context
+#7 transferring context: 224B 0.0s done
+#7 DONE 0.1s
+
+#8 [outbox-worker internal] load build context
+#8 transferring context: 1.27kB 0.0s done
+#8 DONE 0.1s
+
+#9 [outbox-worker builder 1/4] FROM docker.io/library/python:3.11-slim@sha256:9534e5a8e315485d4061ed659af0fd78a284c015f9b73661b41d6bab25604534
+#9 resolve docker.io/library/python:3.11-slim@sha256:9534e5a8e315485d4061ed659af0fd78a284c015f9b73661b41d6bab25604534 0.1s done
+#9 DONE 0.1s
+
+#10 [outbox-worker stage-1 4/5] COPY --from=builder /install /usr/local
+#10 CACHED
+
+#11 [outbox-worker builder 3/4] COPY requirements.txt .
+#11 CACHED
+
+#12 [outbox-worker builder 4/4] RUN pip install --no-cache-dir --prefix=/install -r requirements.txt
+#12 CACHED
+
+#13 [ai-service stage-1 4/5] COPY --from=builder /install /usr/local
+#13 CACHED
+
+#14 [outbox-worker stage-1 2/5] RUN useradd --create-home --uid 1000 appuser
+#14 CACHED
+
+#15 [ai-service builder 4/4] RUN pip install --no-cache-dir --prefix=/install -r requirements.txt
+#15 CACHED
+
+#16 [outbox-worker builder 2/4] WORKDIR /build
+#16 CACHED
+
+#17 [ai-service builder 3/4] COPY requirements.txt .
+#17 CACHED
+
+#18 [outbox-worker stage-1 3/5] WORKDIR /srv
+#18 CACHED
+
+#19 [outbox-worker stage-1 5/5] COPY app ./app
+#19 CACHED
+
+#20 [ai-service stage-1 5/5] COPY app ./app
+#20 CACHED
+
+#21 [transaction-api] exporting to image
+#21 exporting layers 0.0s done
+#21 exporting manifest sha256:7ced4ec59cf34006572369a07513d1b6d5e8c71cd1f57b148ae2df52ca7898f6 done
+#21 exporting config sha256:cc504fd323635204d4e999661071cef4cc14aca095e224ebfc3c216099e85185 0.0s done
+#21 exporting attestation manifest sha256:c0e4843bc535138ef2ab97b8b146db9df351e8e9555cb085902cc9a6b486fbe3
+#21 exporting attestation manifest sha256:c0e4843bc535138ef2ab97b8b146db9df351e8e9555cb085902cc9a6b486fbe3 0.1s done
+#21 exporting manifest list sha256:2a1afb5ad84b05af51264795e9502537da3ceff8d9b235bdd8355ebd0a0363b0 0.1s done
+#21 naming to docker.io/library/smartbancs_app-transaction-api:latest 0.0s done
+#21 unpacking to docker.io/library/smartbancs_app-transaction-api:latest 0.1s done
+#21 DONE 0.5s
+
+#22 [outbox-worker] exporting to image
+#22 exporting layers 0.0s done
+#22 exporting manifest sha256:1a6790e4b62aac52df57128c1d81b2eb529c5c188f302f6184083d472907141a done
+#22 exporting config sha256:f1496188c9642811e81b72e172dbfb5f708584921c020180da405fecf72010a2 done
+#22 exporting attestation manifest sha256:2a514c331257a1b2b532d0a8c29666525d385f6f3c6ee4ccd991f09bfdd84c26 0.1s done
+#22 exporting manifest list sha256:51bc0e2941fa51157910fede579dd1dfeb1503b71a7ef9e33e5e76ac0e527aed 0.1s done
+#22 naming to docker.io/library/smartbancs_app-outbox-worker:latest 0.0s done
+#22 unpacking to docker.io/library/smartbancs_app-outbox-worker:latest 0.0s done
+#22 DONE 0.4s
+
+#23 [ai-service] exporting to image
+#23 exporting layers 0.0s done
+#23 exporting manifest sha256:922993940df0f8fb7189a1b4755cf52b49e661e0781390030e5c48de2fd2472a done
+#23 exporting config sha256:30f6e1092e2cb9c870740bb4f417faea4f306aedc9566a80ef82b93335553887 0.0s done
+#23 exporting attestation manifest sha256:123eeac957a7b4a5ed2f466d98c0890fc3474497c874eda1882c4802827ebb29 0.1s done
+#23 exporting manifest list sha256:f777fb08de7b63ac6eb89203978a3696101a0007a4691e973173221173b63701 0.1s done
+#23 naming to docker.io/library/smartbancs_app-ai-service:latest 0.0s done
+#23 unpacking to docker.io/library/smartbancs_app-ai-service:latest 0.1s done
+#23 DONE 0.5s
+
+#24 [outbox-worker] resolving provenance for metadata file
+#24 DONE 0.7s
+
+#25 [transaction-api] resolving provenance for metadata file
+#25 DONE 0.7s
+
+#26 [ai-service] resolving provenance for metadata file
+#26 DONE 0.1s
+ Image smartbancs_app-transaction-api Built 
+ Image smartbancs_app-ai-service Built 
+ Image smartbancs_app-outbox-worker Built 
+ Container smartbancs_app-ai-service-1 Running 
+ Container smartbancs_app-outbox-worker-1 Running 
+ Container smartbancs_app-prometheus-1 Running 
+ Container smartbancs_app-postgres-1 Running 
+ Container smartbancs_app-transaction-api-1 Running 
+ Container smartbancs_app-postgres-1 Waiting 
+ Container smartbancs_app-postgres-1 Waiting 
+ Container smartbancs_app-postgres-1 Healthy 
+ Container smartbancs_app-postgres-1 Healthy 
+  backlog de IA vacío
+ Container smartbancs_app-transaction-api-1 Restarting 
+ Container smartbancs_app-outbox-worker-1 Restarting 
+ Container smartbancs_app-outbox-worker-1 Started 
+ Container smartbancs_app-transaction-api-1 Started 
+
+=== ai_on_1 (IA: up) ===
+ Container smartbancs_app-postgres-1 Running 
+ Container smartbancs_app-transaction-api-1 Running 
+ Container smartbancs_app-postgres-1 Waiting 
+ Container smartbancs_app-postgres-1 Healthy 
+ Container smartbancs_app-transaction-api-1 Waiting 
+ Container smartbancs_app-transaction-api-1 Healthy 
+ Container smartbancs_app-tests-run-8a83183d104f Creating 
+ Container smartbancs_app-tests-run-8a83183d104f Created 
+[ai_on_1] guardado en /evidence/ai-resilience/ai_on_1.json
+  sostenida  p50=  286.7ms  p95=  688.9ms  p99=  893.4ms  http={201: 300}
+  rafaga     p50= 3603.9ms  p95= 4567.7ms  p99= 4704.6ms  http={201: 300}
+  actividad de IA durante la medición: {'ai_calls_delta_by_status': {}, 'avg_ai_call_ms': None, 'circuit_breaker_state_after': 'CLOSED'}
+  drenando backlog de IA: 64 pendientes...
+  drenando backlog de IA: 64 pendientes...
+  drenando backlog de IA: 64 pendientes...
+  drenando backlog de IA: 64 pendientes...
+  drenando backlog de IA: 64 pendientes...
+  drenando backlog de IA: 64 pendientes...
+  backlog de IA vacío
+ Container smartbancs_app-ai-service-1 Stopping 
+ Container smartbancs_app-ai-service-1 Stopped 
+ Container smartbancs_app-outbox-worker-1 Restarting 
+ Container smartbancs_app-transaction-api-1 Restarting 
+ Container smartbancs_app-outbox-worker-1 Started 
+ Container smartbancs_app-transaction-api-1 Started 
+
+=== ai_off_1 (IA: stopped) ===
+resolver ai-service (detenido): FALLA gaierror tras 3.34s
+ Container smartbancs_app-transaction-api-1 Running 
+ Container smartbancs_app-postgres-1 Running 
+ Container smartbancs_app-postgres-1 Waiting 
+ Container smartbancs_app-postgres-1 Healthy 
+ Container smartbancs_app-transaction-api-1 Waiting 
+ Container smartbancs_app-transaction-api-1 Healthy 
+ Container smartbancs_app-tests-run-992609cee7c9 Creating 
+ Container smartbancs_app-tests-run-992609cee7c9 Created 
+[ai_off_1] guardado en /evidence/ai-resilience/ai_off_1.json
+  sostenida  p50=  204.5ms  p95=  634.8ms  p99=  824.3ms  http={201: 300}
+  rafaga     p50= 2982.3ms  p95= 3717.3ms  p99= 3935.6ms  http={201: 300}
+  actividad de IA durante la medición: {'ai_calls_delta_by_status': {}, 'avg_ai_call_ms': None, 'circuit_breaker_state_after': 'CLOSED'}
+  drenando backlog de IA: 610 pendientes...
+  drenando backlog de IA: 528 pendientes...
+  drenando backlog de IA: 384 pendientes...
+  drenando backlog de IA: 228 pendientes...
+  drenando backlog de IA: 84 pendientes...
+  backlog de IA vacío
+ Container smartbancs_app-outbox-worker-1 Restarting 
+ Container smartbancs_app-transaction-api-1 Restarting 
+ Container smartbancs_app-outbox-worker-1 Started 
+ Container smartbancs_app-transaction-api-1 Started 
+
+=== ai_on_2 (IA: up) ===
+ Container smartbancs_app-postgres-1 Running 
+ Container smartbancs_app-transaction-api-1 Running 
+ Container smartbancs_app-postgres-1 Waiting 
+ Container smartbancs_app-postgres-1 Healthy 
+ Container smartbancs_app-transaction-api-1 Waiting 
+ Container smartbancs_app-transaction-api-1 Healthy 
+ Container smartbancs_app-tests-run-03fb4d539778 Creating 
+ Container smartbancs_app-tests-run-03fb4d539778 Created 
+[ai_on_2] guardado en /evidence/ai-resilience/ai_on_2.json
+  sostenida  p50=  230.7ms  p95=  583.9ms  p99=  882.8ms  http={201: 300}
+  rafaga     p50= 3358.7ms  p95= 4174.1ms  p99= 4396.7ms  http={201: 300}
+  actividad de IA durante la medición: {'ai_calls_delta_by_status': {}, 'avg_ai_call_ms': None, 'circuit_breaker_state_after': 'CLOSED'}
+  drenando backlog de IA: 31 pendientes...
+  backlog de IA vacío
+ Container smartbancs_app-ai-service-1 Stopping 
+ Container smartbancs_app-ai-service-1 Stopped 
+ Container smartbancs_app-transaction-api-1 Restarting 
+ Container smartbancs_app-outbox-worker-1 Restarting 
+ Container smartbancs_app-outbox-worker-1 Started 
+ Container smartbancs_app-transaction-api-1 Started 
+
+=== ai_off_2 (IA: stopped) ===
+ Container smartbancs_app-postgres-1 Running 
+ Container smartbancs_app-transaction-api-1 Running 
+ Container smartbancs_app-postgres-1 Waiting 
+ Container smartbancs_app-postgres-1 Healthy 
+ Container smartbancs_app-transaction-api-1 Waiting 
+ Container smartbancs_app-transaction-api-1 Healthy 
+ Container smartbancs_app-tests-run-b0a762910fb3 Creating 
+ Container smartbancs_app-tests-run-b0a762910fb3 Created 
+[ai_off_2] guardado en /evidence/ai-resilience/ai_off_2.json
+  sostenida  p50=  212.8ms  p95=  569.8ms  p99=  766.5ms  http={201: 300}
+  rafaga     p50= 2543.3ms  p95= 3532.1ms  p99= 3746.7ms  http={201: 300}
+  actividad de IA durante la medición: {'ai_calls_delta_by_status': {}, 'avg_ai_call_ms': None, 'circuit_breaker_state_after': 'CLOSED'}
+  drenando backlog de IA: 610 pendientes...
+  drenando backlog de IA: 581 pendientes...
+  drenando backlog de IA: 413 pendientes...
+  drenando backlog de IA: 278 pendientes...
+  drenando backlog de IA: 156 pendientes...
+  drenando backlog de IA: 13 pendientes...
+  backlog de IA vacío
+ Container smartbancs_app-outbox-worker-1 Restarting 
+ Container smartbancs_app-transaction-api-1 Restarting 
+ Container smartbancs_app-outbox-worker-1 Started 
+ Container smartbancs_app-transaction-api-1 Started 
+
+=== ai_on_3 (IA: up) ===
+ Container smartbancs_app-postgres-1 Running 
+ Container smartbancs_app-transaction-api-1 Running 
+ Container smartbancs_app-postgres-1 Waiting 
+ Container smartbancs_app-postgres-1 Healthy 
+ Container smartbancs_app-transaction-api-1 Waiting 
+ Container smartbancs_app-transaction-api-1 Healthy 
+ Container smartbancs_app-tests-run-d6f6b23f5ade Creating 
+ Container smartbancs_app-tests-run-d6f6b23f5ade Created 
+[ai_on_3] guardado en /evidence/ai-resilience/ai_on_3.json
+  sostenida  p50=  277.5ms  p95=  638.3ms  p99=  927.6ms  http={201: 300}
+  rafaga     p50= 3563.3ms  p95= 4383.7ms  p99= 4811.6ms  http={201: 300}
+  actividad de IA durante la medición: {'ai_calls_delta_by_status': {}, 'avg_ai_call_ms': None, 'circuit_breaker_state_after': 'CLOSED'}
+  drenando backlog de IA: 23 pendientes...
+  backlog de IA vacío
+ Container smartbancs_app-ai-service-1 Stopping 
+ Container smartbancs_app-ai-service-1 Stopped 
+ Container smartbancs_app-outbox-worker-1 Restarting 
+ Container smartbancs_app-transaction-api-1 Restarting 
+ Container smartbancs_app-outbox-worker-1 Started 
+ Container smartbancs_app-transaction-api-1 Started 
+
+=== ai_off_3 (IA: stopped) ===
+ Container smartbancs_app-postgres-1 Running 
+ Container smartbancs_app-transaction-api-1 Running 
+ Container smartbancs_app-postgres-1 Waiting 
+ Container smartbancs_app-postgres-1 Healthy 
+ Container smartbancs_app-transaction-api-1 Waiting 
+ Container smartbancs_app-transaction-api-1 Healthy 
+ Container smartbancs_app-tests-run-c03829f111ac Creating 
+ Container smartbancs_app-tests-run-c03829f111ac Created 
+[ai_off_3] guardado en /evidence/ai-resilience/ai_off_3.json
+  sostenida  p50=  204.0ms  p95=  567.7ms  p99=  762.5ms  http={201: 300}
+  rafaga     p50= 2721.3ms  p95= 3687.7ms  p99= 3877.8ms  http={201: 300}
+  actividad de IA durante la medición: {'ai_calls_delta_by_status': {}, 'avg_ai_call_ms': None, 'circuit_breaker_state_after': 'CLOSED'}
+  drenando backlog de IA: 610 pendientes...
+  drenando backlog de IA: 578 pendientes...
+  drenando backlog de IA: 414 pendientes...
+  drenando backlog de IA: 271 pendientes...
+  drenando backlog de IA: 120 pendientes...
+  backlog de IA vacío
+ Container smartbancs_app-ai-service-1 Paused 
+ Container smartbancs_app-transaction-api-1 Restarting 
+ Container smartbancs_app-outbox-worker-1 Restarting 
+ Container smartbancs_app-outbox-worker-1 Started 
+ Container smartbancs_app-transaction-api-1 Started 
+
+=== ai_hung (IA: paused) ===
+ Container smartbancs_app-transaction-api-1 Running 
+ Container smartbancs_app-postgres-1 Running 
+ Container smartbancs_app-postgres-1 Waiting 
+ Container smartbancs_app-postgres-1 Healthy 
+ Container smartbancs_app-transaction-api-1 Waiting 
+ Container smartbancs_app-transaction-api-1 Healthy 
+ Container smartbancs_app-tests-run-7379bfeb9f75 Creating 
+ Container smartbancs_app-tests-run-7379bfeb9f75 Created 
+[ai_hung] guardado en /evidence/ai-resilience/ai_hung.json
+  sostenida  p50=  213.2ms  p95=  613.4ms  p99=  837.0ms  http={201: 300}
+  rafaga     p50= 2044.8ms  p95= 3516.4ms  p99= 3780.7ms  http={201: 300}
+  actividad de IA durante la medición: {'ai_calls_delta_by_status': {}, 'avg_ai_call_ms': None, 'circuit_breaker_state_after': 'CLOSED'}
+  drenando backlog de IA: 610 pendientes...
+  drenando backlog de IA: 575 pendientes...
+  drenando backlog de IA: 411 pendientes...
+  drenando backlog de IA: 273 pendientes...
+  drenando backlog de IA: 111 pendientes...
+  backlog de IA vacío
+ Container smartbancs_app-postgres-1 Running 
+ Container smartbancs_app-transaction-api-1 Recreate 
+ Container smartbancs_app-transaction-api-1 Recreated 
+ Container smartbancs_app-postgres-1 Waiting 
+ Container smartbancs_app-postgres-1 Healthy 
+ Container smartbancs_app-transaction-api-1 Starting 
+ Container smartbancs_app-transaction-api-1 Started 
+ Container smartbancs_app-outbox-worker-1 Restarting 
+ Container smartbancs_app-outbox-worker-1 Started 
+
+=== ai_inproc_on (IA: up, la API notifica en BackgroundTasks) ===
+ Container smartbancs_app-postgres-1 Running 
+ Container smartbancs_app-transaction-api-1 Recreate 
+ Container smartbancs_app-transaction-api-1 Recreated 
+ Container smartbancs_app-postgres-1 Waiting 
+ Container smartbancs_app-postgres-1 Healthy 
+ Container smartbancs_app-transaction-api-1 Starting 
+ Container smartbancs_app-transaction-api-1 Started 
+ Container smartbancs_app-transaction-api-1 Waiting 
+ Container smartbancs_app-transaction-api-1 Healthy 
+ Container smartbancs_app-tests-run-aef5dd1a4b0d Creating 
+ Container smartbancs_app-tests-run-aef5dd1a4b0d Created 
+[ai_inproc_on] guardado en /evidence/ai-resilience/ai_inproc_on.json
+  sostenida  p50=  221.7ms  p95=  481.9ms  p99=  792.1ms  http={201: 300}
+  rafaga     p50= 3213.6ms  p95= 4939.9ms  p99= 5258.8ms  http={201: 300}
+  actividad de IA durante la medición: {'ai_calls_delta_by_status': {}, 'avg_ai_call_ms': None, 'circuit_breaker_state_after': 'CLOSED'}
+ Container smartbancs_app-ai-service-1 Stopping 
+ Container smartbancs_app-ai-service-1 Stopped 
+ Container smartbancs_app-outbox-worker-1 Restarting 
+ Container smartbancs_app-transaction-api-1 Restarting 
+ Container smartbancs_app-transaction-api-1 Started 
+ Container smartbancs_app-outbox-worker-1 Started 
+
+=== ai_inproc_off (IA: stopped, la API notifica en BackgroundTasks) ===
+ Container smartbancs_app-postgres-1 Running 
+ Container smartbancs_app-transaction-api-1 Running 
+ Container smartbancs_app-postgres-1 Waiting 
+ Container smartbancs_app-postgres-1 Healthy 
+ Container smartbancs_app-transaction-api-1 Waiting 
+ Container smartbancs_app-transaction-api-1 Healthy 
+ Container smartbancs_app-tests-run-52904ffd9c78 Creating 
+ Container smartbancs_app-tests-run-52904ffd9c78 Created 
+[ai_inproc_off] guardado en /evidence/ai-resilience/ai_inproc_off.json
+  sostenida  p50=  198.6ms  p95=  582.0ms  p99=  796.9ms  http={201: 300}
+  rafaga     p50= 2514.2ms  p95= 3349.9ms  p99= 3551.6ms  http={201: 300}
+  actividad de IA durante la medición: {'ai_calls_delta_by_status': {}, 'avg_ai_call_ms': None, 'circuit_breaker_state_after': 'CLOSED'}
+ Container smartbancs_app-ai-service-1 Starting 
+ Container smartbancs_app-ai-service-1 Started 
+ Container smartbancs_app-postgres-1 Running 
+ Container smartbancs_app-transaction-api-1 Running 
+ Container smartbancs_app-postgres-1 Waiting 
+ Container smartbancs_app-postgres-1 Healthy 
+
+ Container smartbancs_app-transaction-api-1 Running 
+ Container smartbancs_app-postgres-1 Running 
+ Container smartbancs_app-postgres-1 Waiting 
+ Container smartbancs_app-postgres-1 Healthy 
+ Container smartbancs_app-transaction-api-1 Waiting 
+ Container smartbancs_app-transaction-api-1 Healthy 
+ Container smartbancs_app-tests-run-a94346256709 Creating 
+ Container smartbancs_app-tests-run-a94346256709 Created 
+COMPARATIVO DE LATENCIA DE TRANSFERENCIAS SEGÚN EL ESTADO DE LA IA
+====================================================================================================
+Cada fila = 1 medición de 3 rondas x 100 transferencias. Condiciones ALTERNADAS (on, off, on, off...) para repartir el ruido.
+La cifra que se compara es la MEDIANA de los p95 de las repeticiones (robusta ante una repetición atípica).
+
+PERFIL SOSTENIDA: 100 transferencias, 10 simultáneas
+Medición              p50      p95      p99       max   p95 por ronda          HTTP
+----------------------------------------------------------------------------------------------------
+ai_on_1             287ms    689ms    893ms     961ms   783 / 597 / 565        {'201': 300}
+ai_on_2             231ms    584ms    883ms    1005ms   766 / 475 / 584        {'201': 300}
+ai_on_3             278ms    638ms    928ms    1218ms   890 / 533 / 519        {'201': 300}
+ai_off_1            204ms    635ms    824ms     903ms   712 / 511 / 510        {'201': 300}
+ai_off_2            213ms    570ms    766ms    1128ms   721 / 555 / 410        {'201': 300}
+ai_off_3            204ms    568ms    762ms     864ms   663 / 498 / 478        {'201': 300}
+ai_hung             213ms    613ms    837ms     913ms   659 / 613 / 585        {'201': 300}
+  Mediana de p95:  encendida 638ms   apagada 570ms (-10.7%)   colgada 613ms (-3.9%)
+  Criterio A (apagada/colgada <= 1.15 x encendida): CUMPLE
+  Criterio B (SLO p95 < 2000ms, IA apagada): CUMPLE
+
+  Modo BackgroundTasks (AI_NOTIFY_IN_PROCESS=true, paso 10 literal) - perfil sostenida:
+  Medición              p50      p95      p99       max   p95 por ronda          HTTP
+ai_inproc_off       199ms    582ms    797ms    1158ms   651 / 486 / 532        {'201': 300}
+ai_inproc_on        222ms    482ms    792ms     820ms   752 / 435 / 438        {'201': 300}
+
+PERFIL RAFAGA: 100 transferencias, 100 simultáneas
+Medición              p50      p95      p99       max   p95 por ronda          HTTP
+----------------------------------------------------------------------------------------------------
+ai_on_1            3604ms   4568ms   4705ms    4794ms   4665 / 4279 / 4100     {'201': 300}
+ai_on_2            3359ms   4174ms   4397ms    4450ms   4172 / 4210 / 4093     {'201': 300}
+ai_on_3            3563ms   4384ms   4812ms    5015ms   4799 / 4392 / 4016     {'201': 300}
+ai_off_1           2982ms   3717ms   3936ms    4105ms   3745 / 3700 / 3687     {'201': 300}
+ai_off_2           2543ms   3532ms   3747ms    3877ms   3550 / 3629 / 3017     {'201': 300}
+ai_off_3           2721ms   3688ms   3878ms    3994ms   3822 / 3313 / 3182     {'201': 300}
+ai_hung            2045ms   3516ms   3781ms    3851ms   3724 / 3370 / 3062     {'201': 300}
+  Mediana de p95:  encendida 4384ms   apagada 3688ms (-15.9%)   colgada 3516ms (-19.8%)
+  Criterio A (apagada/colgada <= 1.15 x encendida): CUMPLE
+  Criterio B (SLO p95 < 2000ms, IA apagada): NO CUMPLE (capacidad de una instancia, no de la IA)
+
+  Modo BackgroundTasks (AI_NOTIFY_IN_PROCESS=true, paso 10 literal) - perfil rafaga:
+  Medición              p50      p95      p99       max   p95 por ronda          HTTP
+ai_inproc_off      2514ms   3350ms   3552ms    3574ms   3277 / 3034 / 3491     {'201': 300}
+ai_inproc_on       3214ms   4940ms   5259ms    5422ms   5152 / 4439 / 4324     {'201': 300}
+
+Coste de una IA SÍNCRONA: cada llamada tarda de media None ms, que se sumarían a CADA transferencia.
+Criterio A = la caída/cuelgue de la IA no empeora la latencia (tolerancia 15% para el ruido de medición).
+Criterio B = requisito del reto (< 2 s); en ráfaga de 100 simultáneas lo limita la capacidad de UNA instancia, no la IA.
+
+=== RECUPERACIÓN: la IA vuelve y el worker entrega los eventos acumulados ===
+  t+4s  eventos de IA pendientes: 649
+  t+8s  eventos de IA pendientes: 649
+  t+12s  eventos de IA pendientes: 649
+  t+16s  eventos de IA pendientes: 649
+  t+20s  eventos de IA pendientes: 649
+  t+24s  eventos de IA pendientes: 649
+  t+28s  eventos de IA pendientes: 606
+  t+32s  eventos de IA pendientes: 501
+  t+36s  eventos de IA pendientes: 424
+  t+40s  eventos de IA pendientes: 290
+  t+44s  eventos de IA pendientes: 158
+  t+48s  eventos de IA pendientes: 51
+  t+52s  eventos de IA pendientes: 0
+Estado final de los eventos ai.transaction_created:
+SENT|19409
+Recomendaciones almacenadas: 19409

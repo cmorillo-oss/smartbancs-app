@@ -1,0 +1,46 @@
+COMPARATIVO DE LATENCIA DE TRANSFERENCIAS SEGÚN EL ESTADO DE LA IA
+====================================================================================================
+Cada fila = 1 medición de 3 rondas x 100 transferencias. Condiciones ALTERNADAS (on, off, on, off...) para repartir el ruido.
+La cifra que se compara es la MEDIANA de los p95 de las repeticiones (robusta ante una repetición atípica).
+
+PERFIL SOSTENIDA: 100 transferencias, 10 simultáneas
+Medición              p50      p95      p99       max   p95 por ronda          HTTP
+----------------------------------------------------------------------------------------------------
+ai_on_1             287ms    689ms    893ms     961ms   783 / 597 / 565        {'201': 300}
+ai_on_2             231ms    584ms    883ms    1005ms   766 / 475 / 584        {'201': 300}
+ai_on_3             278ms    638ms    928ms    1218ms   890 / 533 / 519        {'201': 300}
+ai_off_1            204ms    635ms    824ms     903ms   712 / 511 / 510        {'201': 300}
+ai_off_2            213ms    570ms    766ms    1128ms   721 / 555 / 410        {'201': 300}
+ai_off_3            204ms    568ms    762ms     864ms   663 / 498 / 478        {'201': 300}
+ai_hung             213ms    613ms    837ms     913ms   659 / 613 / 585        {'201': 300}
+  Mediana de p95:  encendida 638ms   apagada 570ms (-10.7%)   colgada 613ms (-3.9%)
+  Criterio A (apagada/colgada <= 1.15 x encendida): CUMPLE
+  Criterio B (SLO p95 < 2000ms, IA apagada): CUMPLE
+
+  Modo BackgroundTasks (AI_NOTIFY_IN_PROCESS=true, paso 10 literal) - perfil sostenida:
+  Medición              p50      p95      p99       max   p95 por ronda          HTTP
+ai_inproc_off       199ms    582ms    797ms    1158ms   651 / 486 / 532        {'201': 300}
+ai_inproc_on        222ms    482ms    792ms     820ms   752 / 435 / 438        {'201': 300}
+
+PERFIL RAFAGA: 100 transferencias, 100 simultáneas
+Medición              p50      p95      p99       max   p95 por ronda          HTTP
+----------------------------------------------------------------------------------------------------
+ai_on_1            3604ms   4568ms   4705ms    4794ms   4665 / 4279 / 4100     {'201': 300}
+ai_on_2            3359ms   4174ms   4397ms    4450ms   4172 / 4210 / 4093     {'201': 300}
+ai_on_3            3563ms   4384ms   4812ms    5015ms   4799 / 4392 / 4016     {'201': 300}
+ai_off_1           2982ms   3717ms   3936ms    4105ms   3745 / 3700 / 3687     {'201': 300}
+ai_off_2           2543ms   3532ms   3747ms    3877ms   3550 / 3629 / 3017     {'201': 300}
+ai_off_3           2721ms   3688ms   3878ms    3994ms   3822 / 3313 / 3182     {'201': 300}
+ai_hung            2045ms   3516ms   3781ms    3851ms   3724 / 3370 / 3062     {'201': 300}
+  Mediana de p95:  encendida 4384ms   apagada 3688ms (-15.9%)   colgada 3516ms (-19.8%)
+  Criterio A (apagada/colgada <= 1.15 x encendida): CUMPLE
+  Criterio B (SLO p95 < 2000ms, IA apagada): NO CUMPLE (capacidad de una instancia, no de la IA)
+
+  Modo BackgroundTasks (AI_NOTIFY_IN_PROCESS=true, paso 10 literal) - perfil rafaga:
+  Medición              p50      p95      p99       max   p95 por ronda          HTTP
+ai_inproc_off      2514ms   3350ms   3552ms    3574ms   3277 / 3034 / 3491     {'201': 300}
+ai_inproc_on       3214ms   4940ms   5259ms    5422ms   5152 / 4439 / 4324     {'201': 300}
+
+Coste de una IA SÍNCRONA: cada llamada tarda entre 300 y 800 ms (mock; media medida ~549 ms), que se sumarían a CADA transferencia.
+Criterio A = la caída/cuelgue de la IA no empeora la latencia (tolerancia 15% para el ruido de medición).
+Criterio B = requisito del reto (< 2 s); en ráfaga de 100 simultáneas lo limita la capacidad de UNA instancia, no la IA.

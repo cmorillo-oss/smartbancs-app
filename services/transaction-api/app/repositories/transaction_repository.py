@@ -86,14 +86,17 @@ async def insert_ledger_pair(
 
 async def insert_outbox_event(
     session: AsyncSession, *, aggregate_id: uuid.UUID, event_type: str, payload: dict, trace_id: str
-) -> None:
+) -> int:
     # default=str: Decimal y UUID no son serializables por defecto; se guardan como texto
     # (los montos como string evitan perder precisión al pasar por JSON).
-    await session.execute(
+    # Devuelve el id del evento: la tarea de fondo lo reclama por PRIMARY KEY (rápido) en vez de
+    # buscarlo por aggregate_id (que no tiene índice y recorrería toda la tabla).
+    row = await session.execute(
         text(
             """
             INSERT INTO outbox_events (aggregate_id, event_type, payload, trace_id)
             VALUES (:agg, :etype, CAST(:payload AS jsonb), :trace_id)
+            RETURNING id
             """
         ),
         {
@@ -101,6 +104,7 @@ async def insert_outbox_event(
             "payload": json.dumps(payload, default=str), "trace_id": trace_id,
         },
     )
+    return row.scalar_one()
 
 
 async def list_for_account(session: AsyncSession, account_id: int, limit: int, offset: int):

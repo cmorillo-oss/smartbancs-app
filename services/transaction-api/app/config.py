@@ -40,6 +40,37 @@ class Settings(BaseSettings):
     def currencies(self) -> set[str]:
         return {c.strip().upper() for c in self.supported_currencies.split(",") if c.strip()}
 
+    # --- IA (Fase 5) ---
+    ai_service_url: str = "http://ai-service:8001"
+    # Timeout DURO de la llamada a la IA. 1s: la IA simulada tarda 300-800ms, así que 1s da margen
+    # normal, pero corta de raíz una IA lenta antes de acumular tareas de fondo colgadas.
+    ai_timeout_s: float = 1.0
+    # Circuit breaker: 5 fallos consecutivos abren el circuito; tras 30s se prueba de nuevo.
+    ai_breaker_failure_threshold: int = 5
+    ai_breaker_recovery_s: float = 30.0
+    # Quién notifica a la IA tras una transferencia:
+    #   False (por defecto): SOLO el worker del outbox (proceso aparte). La API no habla con la IA
+    #        en absoluto, así que ningún fallo de la IA puede tocar su event loop, su pool ni su DNS.
+    #   True: además la API lanza la notificación en BackgroundTasks tras el commit (paso 10 literal del brief).
+    # POR QUÉ el defecto es False: la medición (evidence/ai-resilience) mostró que con True y la IA
+    # apagada, las búsquedas DNS fallidas de ai-service (3.5s cada una en Docker) saturan los hilos
+    # de resolución que la API también necesita para abrir conexiones a Postgres: hasta 13s de latencia.
+    ai_notify_in_process: bool = False
+    # Mamparo (bulkhead): máximo de llamadas a la IA simultáneas por proceso. Sin tope, un pico de
+    # transferencias generaría miles de tareas de fondo esperando a la IA y agotaría memoria/conexiones.
+    ai_max_concurrency: int = 50
+
+    # --- Worker del outbox (Fase 5) ---
+    outbox_poll_interval_s: float = 2.0
+    outbox_batch_size: int = 100
+    outbox_max_retries: int = 5
+    outbox_backoff_base_s: float = 2.0
+    # Arrendamiento (lease) de un evento reclamado: si el proceso muere con el evento en
+    # PROCESSING, pasado este tiempo vuelve a PENDING y otro lo recoge.
+    outbox_lease_s: int = 60
+    outbox_concurrency: int = 20   # entregas en paralelo dentro de un lote
+    metrics_port: int = 9100       # el worker expone sus métricas aquí
+
     # --- Trazas (OpenTelemetry) ---
     # Vacío = los spans se generan (y dan span_id a los logs) pero NO se exportan.
     # POR QUÉ: así la API arranca sin depender de un colector; exportar es opt-in y un

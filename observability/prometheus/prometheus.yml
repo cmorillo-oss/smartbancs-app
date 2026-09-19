@@ -9,3 +9,12 @@ scrape_configs:
     static_configs:
       # Nombre del servicio en la red de Docker Compose (DNS interno), no localhost.
       - targets: ["transaction-api:8000"]
+
+  - job_name: ai-service
+    static_configs:
+      - targets: ["ai-service:8001"]
+
+  # El worker es un proceso aparte con su propio /metrics (gauge del outbox, estado del breaker de su lado).
+  - job_name: outbox-worker
+    static_configs:
+      - targets: ["outbox-worker:9100"]

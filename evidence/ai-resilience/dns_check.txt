@@ -1,0 +1,1 @@
+resolver ai-service (detenido): FALLA gaierror tras 3.34s

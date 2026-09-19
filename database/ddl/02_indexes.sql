@@ -28,3 +28,8 @@ CREATE INDEX idx_ledger_account_created ON ledger_entries (account_id, created_a
 
 -- "Recomendaciones de este cliente" (lectura desde la app y el ETL).
 CREATE INDEX idx_ai_reco_customer ON ai_recommendations (customer_id);
+
+-- Historial de un CLIENTE (que puede tener varias cuentas): el servicio de IA pide sus últimas
+-- transferencias con `accounts.customer_id = :c`. Sin índice, cada notificación a la IA recorrería
+-- toda la tabla de cuentas. Añadido en la Fase 5.
+CREATE INDEX idx_accounts_customer ON accounts (customer_id);

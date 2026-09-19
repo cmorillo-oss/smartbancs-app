@@ -31,7 +31,10 @@ def new_client() -> httpx.AsyncClient:
     return httpx.AsyncClient(
         base_url=API_URL,
         timeout=60.0,
-        limits=httpx.Limits(max_connections=300, max_keepalive_connections=300),
+        # keepalive_expiry=2: uvicorn cierra las conexiones ociosas a los 5s. Si el cliente reutilizara
+        # una que el servidor ya cerró obtendría un ReadError espurio (carrera clásica de keep-alive);
+        # descartarlas antes (2s) elimina esa carrera sin tocar el servidor.
+        limits=httpx.Limits(max_connections=300, max_keepalive_connections=300, keepalive_expiry=2.0),
     )
 
 

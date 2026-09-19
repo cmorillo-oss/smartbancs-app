@@ -53,6 +53,7 @@ class TransferResult:
     data: dict          # forma de TransferResponse
     replay: bool        # True si es la respuesta almacenada de una petición anterior
     source_customer_id: str | None = None  # para alimentar a la IA (solo si replay=False)
+    ai_event_id: int | None = None         # evento del outbox que la tarea de fondo reclamará
 
 
 def _sqlstate(exc: DBAPIError) -> str | None:
@@ -263,7 +264,7 @@ async def _transaction_attempt(req: TransferRequest, idempotency_key: str, trace
                     "dest_balance_after": dest_after,
                 },
             )
-            await txs.insert_outbox_event(
+            ai_event_id = await txs.insert_outbox_event(
                 session, aggregate_id=tx_id, event_type="ai.transaction_created", trace_id=trace_id,
                 payload={
                     "transaction_id": tx_id, "customer_id": source.customer_id,
@@ -275,6 +276,7 @@ async def _transaction_attempt(req: TransferRequest, idempotency_key: str, trace
             result = TransferResult(
                 replay=False,
                 source_customer_id=source.customer_id,
+                ai_event_id=ai_event_id,
                 data={
                     "transaction_id": tx_id, "idempotency_key": idempotency_key,
                     "status": "COMPLETED", "source_account": source.account_number,

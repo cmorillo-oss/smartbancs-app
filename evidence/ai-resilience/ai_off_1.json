@@ -1,0 +1,117 @@
+{
+  "label": "ai_off_1",
+  "measured_at": "2026-09-19T01:39:28.458499+00:00",
+  "profiles": {
+    "sostenida": {
+      "concurrency": 10,
+      "transfers_per_round": 100,
+      "rounds": [
+        {
+          "count": 100,
+          "p50_ms": 205.7,
+          "p95_ms": 711.8,
+          "p99_ms": 855.5,
+          "max_ms": 903.1,
+          "mean_ms": 295.2,
+          "http_status_counts": {
+            "201": 100
+          },
+          "wall_seconds": 3.1
+        },
+        {
+          "count": 100,
+          "p50_ms": 194.1,
+          "p95_ms": 511.3,
+          "p99_ms": 680.0,
+          "max_ms": 714.7,
+          "mean_ms": 239.3,
+          "http_status_counts": {
+            "201": 100
+          },
+          "wall_seconds": 2.5
+        },
+        {
+          "count": 100,
+          "p50_ms": 208.1,
+          "p95_ms": 509.9,
+          "p99_ms": 824.6,
+          "max_ms": 888.7,
+          "mean_ms": 250.9,
+          "http_status_counts": {
+            "201": 100
+          },
+          "wall_seconds": 2.67
+        }
+      ],
+      "pooled": {
+        "count": 300,
+        "p50_ms": 204.5,
+        "p95_ms": 634.8,
+        "p99_ms": 824.3,
+        "max_ms": 903.1,
+        "mean_ms": 261.8
+      },
+      "http_status_counts": {
+        "201": 300
+      }
+    },
+    "rafaga": {
+      "concurrency": 100,
+      "transfers_per_round": 100,
+      "rounds": [
+        {
+          "count": 100,
+          "p50_ms": 3149.5,
+          "p95_ms": 3744.9,
+          "p99_ms": 4090.1,
+          "max_ms": 4104.6,
+          "mean_ms": 2627.7,
+          "http_status_counts": {
+            "201": 100
+          },
+          "wall_seconds": 4.19
+        },
+        {
+          "count": 100,
+          "p50_ms": 2943.3,
+          "p95_ms": 3700.1,
+          "p99_ms": 3796.3,
+          "max_ms": 3989.8,
+          "mean_ms": 2689.5,
+          "http_status_counts": {
+            "201": 100
+          },
+          "wall_seconds": 4.07
+        },
+        {
+          "count": 100,
+          "p50_ms": 2854.8,
+          "p95_ms": 3687.2,
+          "p99_ms": 3815.3,
+          "max_ms": 3891.3,
+          "mean_ms": 2572.5,
+          "http_status_counts": {
+            "201": 100
+          },
+          "wall_seconds": 3.92
+        }
+      ],
+      "pooled": {
+        "count": 300,
+        "p50_ms": 2982.3,
+        "p95_ms": 3717.3,
+        "p99_ms": 3935.6,
+        "max_ms": 4104.6,
+        "mean_ms": 2629.9
+      },
+      "http_status_counts": {
+        "201": 300
+      }
+    }
+  },
+  "ai_activity_during_measurement": {
+    "ai_calls_delta_by_status": {},
+    "avg_ai_call_ms": null,
+    "circuit_breaker_state_after": "CLOSED"
+  }
+}

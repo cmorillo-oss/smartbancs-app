@@ -1,0 +1,40 @@
+{
+  "sostenida": {
+    "p95_encendida_por_repeticion": [
+      688.9,
+      583.9,
+      638.3
+    ],
+    "p95_apagada_por_repeticion": [
+      634.8,
+      569.8,
+      567.7
+    ],
+    "p95_colgada": [
+      613.4
+    ],
+    "mediana_encendida": 638.3,
+    "mediana_apagada": 569.8,
+    "mediana_colgada": 613.4,
+    "criterio_A": true
+  },
+  "rafaga": {
+    "p95_encendida_por_repeticion": [
+      4567.7,
+      4174.1,
+      4383.7
+    ],
+    "p95_apagada_por_repeticion": [
+      3717.3,
+      3532.1,
+      3687.7
+    ],
+    "p95_colgada": [
+      3516.4
+    ],
+    "mediana_encendida": 4383.7,
+    "mediana_apagada": 3687.7,
+    "mediana_colgada": 3516.4,
+    "criterio_A": true
+  }
+}

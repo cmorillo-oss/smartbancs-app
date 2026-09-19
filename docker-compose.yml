@@ -34,6 +34,9 @@ services:
       DB_MAX_OVERFLOW: ${DB_MAX_OVERFLOW:-10}
       DB_POOL_TIMEOUT: ${DB_POOL_TIMEOUT:-5}
       LOG_LEVEL: ${LOG_LEVEL:-INFO}
+      # SIN depends_on hacia ai-service a propósito: la API debe arrancar y funcionar con la IA caída.
+      AI_SERVICE_URL: ${AI_SERVICE_URL:-http://ai-service:8001}
+      AI_NOTIFY_IN_PROCESS: ${AI_NOTIFY_IN_PROCESS:-false}
       # Vacío = trazas generadas pero no exportadas (no hay colector en el compose por defecto).
       OTEL_EXPORTER_OTLP_ENDPOINT: ${OTEL_EXPORTER_OTLP_ENDPOINT:-}
     ports:
@@ -48,6 +51,37 @@ services:
       interval: 3s
       timeout: 3s
       retries: 15
+
+  ai-service:
+    build: ./services/ai-service
+    environment:
+      AI_SIMULATED_LATENCY_MS: ${AI_SIMULATED_LATENCY_MS:-300-800}
+      AI_FAILURE_RATE: ${AI_FAILURE_RATE:-0}
+      LOG_LEVEL: ${LOG_LEVEL:-INFO}
+    ports:
+      - "${AI_PORT:-8001}:8001"
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8001/health', timeout=2)"]
+      interval: 3s
+      timeout: 3s
+      retries: 10
+
+  # Worker del outbox: MISMA imagen que la API, otro comando. Proceso separado => si se cae o se
+  # satura, las transferencias no se enteran; y se puede escalar a N réplicas (SKIP LOCKED).
+  outbox-worker:
+    build: ./services/transaction-api
+    command: ["python", "-m", "app.workers.outbox_worker"]
+    environment:
+      SERVICE_NAME: outbox-worker
+      DATABASE_URL: ${DATABASE_URL:-postgresql+asyncpg://smartbancs:smartbancs@postgres:5432/smartbancs}
+      # Pool pequeño: el worker hace consultas cortas; no debe quitarle conexiones a la API.
+      DB_POOL_SIZE: ${WORKER_DB_POOL_SIZE:-5}
+      DB_MAX_OVERFLOW: 5
+      LOG_LEVEL: ${LOG_LEVEL:-INFO}
+      AI_SERVICE_URL: ${AI_SERVICE_URL:-http://ai-service:8001}
+    depends_on:
+      postgres:
+        condition: service_healthy
 
   prometheus:
     image: prom/prometheus:v2.55.1
@@ -68,9 +102,13 @@ services:
       API_URL: http://transaction-api:8000
       DATABASE_DSN: postgresql://${POSTGRES_USER:-smartbancs}:${POSTGRES_PASSWORD:-smartbancs}@postgres:5432/${POSTGRES_DB:-smartbancs}
       EVIDENCE_DIR: /evidence/test-data
+      EVIDENCE_AI_DIR: /evidence/ai-resilience
+      # Permite a los tests unitarios importar módulos PUROS de la API (p. ej. el circuit breaker).
+      PYTHONPATH: /srv
     volumes:
       - ./tests:/tests
       - ./evidence:/evidence
+      - ./services/transaction-api/app:/srv/app:ro
     depends_on:
       transaction-api:
         condition: service_healthy
