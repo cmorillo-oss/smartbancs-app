@@ -60,6 +60,16 @@ AI_CIRCUIT_BREAKER_STATE = Gauge(
 OUTBOX_PENDING = Gauge("smartbancs_outbox_pending_events", "Eventos del outbox pendientes de enviar")
 BANCS_SYNC_TOTAL = Counter("smartbancs_bancs_sync_total", "Lotes sincronizados con Bancs", ["status"])
 
+BANCS_CIRCUIT_BREAKER_STATE = Gauge(
+    "smartbancs_bancs_circuit_breaker_state", "Estado del circuit breaker de Bancs (0=CLOSED,1=OPEN,2=HALF_OPEN)"
+)
+BANCS_SYNC_BATCH_SIZE = Histogram(
+    "smartbancs_bancs_sync_batch_events", "Eventos por lote enviado a Bancs", buckets=(1, 5, 10, 25, 50, 75, 100)
+)
+BANCS_SYNC_DURATION = Histogram(
+    "smartbancs_bancs_sync_duration_seconds", "Latencia de un lote hacia Bancs", buckets=_TX_BUCKETS
+)
+
 # Estado inicial explícito del breaker: sin esto, el gauge arrancaría en 0 igualmente,
 # pero declararlo deja claro que "0 = cerrado = sano" es el valor por defecto.
 AI_CIRCUIT_BREAKER_STATE.set(0)

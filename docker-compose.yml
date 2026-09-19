@@ -17,6 +17,7 @@ services:
       - ./database/ddl/01_schema.sql:/docker-entrypoint-initdb.d/01_schema.sql:ro
       - ./database/ddl/02_indexes.sql:/docker-entrypoint-initdb.d/02_indexes.sql:ro
       - ./database/dml/03_seed.sql:/docker-entrypoint-initdb.d/03_seed.sql:ro
+      - ./database/ddl/04_analytics.sql:/docker-entrypoint-initdb.d/04_analytics.sql:ro
       - pgdata:/var/lib/postgresql/data
     healthcheck:
       # POR QUÉ healthcheck: sin él, depends_on solo espera a que el contenedor ARRANQUE,
@@ -37,6 +38,7 @@ services:
       # SIN depends_on hacia ai-service a propósito: la API debe arrancar y funcionar con la IA caída.
       AI_SERVICE_URL: ${AI_SERVICE_URL:-http://ai-service:8001}
       AI_NOTIFY_IN_PROCESS: ${AI_NOTIFY_IN_PROCESS:-false}
+      BANCS_URL: ${BANCS_URL:-http://bancs-mock:8002}
       # Vacío = trazas generadas pero no exportadas (no hay colector en el compose por defecto).
       OTEL_EXPORTER_OTLP_ENDPOINT: ${OTEL_EXPORTER_OTLP_ENDPOINT:-}
     ports:
@@ -79,6 +81,36 @@ services:
       DB_MAX_OVERFLOW: 5
       LOG_LEVEL: ${LOG_LEVEL:-INFO}
       AI_SERVICE_URL: ${AI_SERVICE_URL:-http://ai-service:8001}
+      BANCS_URL: ${BANCS_URL:-http://bancs-mock:8002}
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  # Core legado simulado: lento (200-500ms) y se satura por encima de BANCS_MAX_CONCURRENT peticiones.
+  bancs-mock:
+    build: ./services/bancs-mock
+    environment:
+      BANCS_LATENCY_MS: ${BANCS_LATENCY_MS:-200-500}
+      BANCS_MAX_CONCURRENT: ${BANCS_MAX_CONCURRENT:-10}
+      LOG_LEVEL: ${LOG_LEVEL:-INFO}
+    ports:
+      - "${BANCS_PORT:-8002}:8002"
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8002/health', timeout=2)"]
+      interval: 3s
+      timeout: 3s
+      retries: 10
+
+  # Pipeline ETL (Fase 6). `profiles: [etl]` => no arranca con `docker compose up`; se lanza con `make etl`.
+  etl:
+    build: ./etl
+    profiles: ["etl"]
+    environment:
+      DATABASE_DSN: postgresql://${POSTGRES_USER:-smartbancs}:${POSTGRES_PASSWORD:-smartbancs}@postgres:5432/${POSTGRES_DB:-smartbancs}
+    volumes:
+      - ./etl:/etl
+      - ./database:/database:ro
+      - ./evidence:/evidence
     depends_on:
       postgres:
         condition: service_healthy
@@ -103,6 +135,8 @@ services:
       DATABASE_DSN: postgresql://${POSTGRES_USER:-smartbancs}:${POSTGRES_PASSWORD:-smartbancs}@postgres:5432/${POSTGRES_DB:-smartbancs}
       EVIDENCE_DIR: /evidence/test-data
       EVIDENCE_AI_DIR: /evidence/ai-resilience
+      EVIDENCE_BANCS_DIR: /evidence/bancs
+      BANCS_URL: http://bancs-mock:8002
       # Permite a los tests unitarios importar módulos PUROS de la API (p. ej. el circuit breaker).
       PYTHONPATH: /srv
     volumes:

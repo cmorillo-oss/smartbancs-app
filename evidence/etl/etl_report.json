@@ -1,0 +1,80 @@
+{
+  "run_id": "88b791b4-838b-4ef2-8b00-64622aa036d8",
+  "finished_at": "2026-09-19T02:31:57.062165+00:00",
+  "read": 4415,
+  "quarantined_total": 461,
+  "quarantine_by_reason": {
+    "wrong_column_count": 45,
+    "invalid_date": 18,
+    "unknown_currency": 10,
+    "missing_critical:date": 40,
+    "missing_critical:amount": 42,
+    "invalid_amount": 19,
+    "negative_amount": 55,
+    "missing_critical:customer_id": 51,
+    "amount_exceeds_cap": 19,
+    "exact_duplicate": 82,
+    "duplicate_business_key": 80
+  },
+  "balanced": true,
+  "stages": {
+    "extract": {
+      "read": 4415,
+      "passed": 4370,
+      "quarantined": 45
+    },
+    "clean": {
+      "in": 4370,
+      "out": 3954,
+      "quarantined": 416,
+      "quarantine_by_reason": {
+        "invalid_date": 18,
+        "unknown_currency": 10,
+        "missing_critical:date": 40,
+        "missing_critical:amount": 42,
+        "invalid_amount": 19,
+        "negative_amount": 55,
+        "missing_critical:customer_id": 51,
+        "amount_exceeds_cap": 19,
+        "exact_duplicate": 82,
+        "duplicate_business_key": 80
+      },
+      "imputations": {
+        "description -> ''": 403,
+        "merchant -> 'DESCONOCIDO'": 214,
+        "currency -> moda de la cuenta": 135
+      }
+    },
+    "transform": {
+      "rows": 3954,
+      "customer_days": 2410,
+      "category_inferred": 835,
+      "flag_atypical_amount": 49,
+      "flag_high_frequency_day": 384,
+      "categories": {
+        "alimentacion": 756,
+        "suscripciones": 730,
+        "servicios": 705,
+        "transporte": 687,
+        "salud": 367,
+        "vivienda": 354,
+        "compras": 347,
+        "otros": 8
+      }
+    },
+    "load": {
+      "parquet_files": 4,
+      "parquet_bytes": 114848,
+      "raw_csv_bytes": 420635,
+      "db_analytics_transactions": 3954,
+      "db_analytics_customer_daily": 2410
+    }
+  },
+  "durations_s": {
+    "extract": 0.055,
+    "clean": 0.217,
+    "transform": 0.087,
+    "load": 0.535,
+    "total": 0.896
+  }
+}

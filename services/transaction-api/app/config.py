@@ -71,6 +71,20 @@ class Settings(BaseSettings):
     outbox_concurrency: int = 20   # entregas en paralelo dentro de un lote
     metrics_port: int = 9100       # el worker expone sus métricas aquí
 
+    # --- Bancs (Fase 6) ---
+    bancs_url: str = "http://bancs-mock:8002"
+    # Un lote a Bancs cuesta 200-500ms (más si está saturado): timeout holgado, sin ser infinito.
+    bancs_timeout_s: float = 5.0
+    bancs_breaker_failure_threshold: int = 5
+    bancs_breaker_recovery_s: float = 30.0
+    # Máximo de lotes que el worker envía seguidos en un ciclo cuando hay cola (lote lleno => no espera 2s).
+    # El tope evita que una cola enorme monopolice el ciclo y hambree a los eventos de la IA.
+    bancs_max_batches_per_cycle: int = 10
+    # Conciliación: consulta a Bancs UNA A UNA, así que se limita para no repetir el problema que
+    # motiva toda la arquitectura (saturar al legado con consultas directas).
+    reconciliation_max_accounts: int = 50
+    reconciliation_concurrency: int = 2
+
     # --- Trazas (OpenTelemetry) ---
     # Vacío = los spans se generan (y dan span_id a los logs) pero NO se exportan.
     # POR QUÉ: así la API arranca sin depender de un colector; exportar es opt-in y un

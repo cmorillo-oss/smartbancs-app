@@ -1,0 +1,72 @@
+{
+  "query_levels": [
+    {
+      "concurrency": 1,
+      "requests": 80,
+      "p50_ms": 335,
+      "p95_ms": 509,
+      "http_503": 0,
+      "error_rate": 0.0,
+      "successful_per_second": 2.9
+    },
+    {
+      "concurrency": 5,
+      "requests": 80,
+      "p50_ms": 391,
+      "p95_ms": 504,
+      "http_503": 0,
+      "error_rate": 0.0,
+      "successful_per_second": 12.6
+    },
+    {
+      "concurrency": 10,
+      "requests": 80,
+      "p50_ms": 360,
+      "p95_ms": 542,
+      "http_503": 0,
+      "error_rate": 0.0,
+      "successful_per_second": 24.5
+    },
+    {
+      "concurrency": 20,
+      "requests": 80,
+      "p50_ms": 1331,
+      "p95_ms": 1469,
+      "http_503": 62,
+      "error_rate": 0.775,
+      "successful_per_second": 3.2
+    },
+    {
+      "concurrency": 40,
+      "requests": 80,
+      "p50_ms": 2111,
+      "p95_ms": 3521,
+      "http_503": 50,
+      "error_rate": 0.625,
+      "successful_per_second": 5.1
+    },
+    {
+      "concurrency": 80,
+      "requests": 80,
+      "p50_ms": 3381,
+      "p95_ms": 6864,
+      "http_503": 54,
+      "error_rate": 0.675,
+      "successful_per_second": 3.4
+    }
+  ],
+  "batching": {
+    "one_event_per_request": {
+      "requests": 1000,
+      "seconds": 37.7,
+      "http_503": 0,
+      "events_delivered": 1000
+    },
+    "batches_of_100": {
+      "requests": 10,
+      "seconds": 4.1,
+      "http_503": 0,
+      "events_delivered": 1000
+    }
+  }
+}

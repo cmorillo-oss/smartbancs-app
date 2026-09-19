@@ -1,10 +1,10 @@
 {
   "requests": 100,
   "amount_each": "50.00",
-  "elapsed_seconds": 3.138,
+  "elapsed_seconds": 8.045,
   "http_status_counts": {
-    "422": 80,
-    "201": 20
+    "201": 20,
+    "422": 80
   },
   "error_code_counts": {
     "INSUFFICIENT_FUNDS": 80

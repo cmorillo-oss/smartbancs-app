@@ -1,0 +1,17 @@
+BANCS BAJO CARGA: consultas directas (GET) con concurrencia creciente
+==============================================================================
+ Simultáneas      p50      p95    503   % error   OK/seg
+------------------------------------------------------------------------------
+           1    335ms    509ms      0        0%      2.9
+           5    391ms    504ms      0        0%     12.6
+          10    360ms    542ms      0        0%     24.5
+          20   1331ms   1469ms     62       78%      3.2
+          40   2111ms   3521ms     50       62%      5.1
+          80   3381ms   6864ms     54       68%      3.4
+
+ENVIAR 1000 CAMBIOS DE SALDO A BANCS
+==============================================================================
+  Uno por petición (10 simultáneas):  1000 peticiones    37.7s   503:    0   entregados: 1000
+  Lotes de 100 (secuenciales):          10 peticiones     4.1s   503:    0   entregados: 1000
+
+Conclusión: por encima de 10 peticiones simultáneas Bancs se degrada; agrupar en lotes le presenta muchas menos peticiones.

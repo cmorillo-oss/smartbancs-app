@@ -7,6 +7,7 @@ from fastapi.responses import JSONResponse
 from prometheus_client import CONTENT_TYPE_LATEST, generate_latest
 from sqlalchemy import text
 
+from app.api.admin_routes import router as admin_router
 from app.api.routes import router
 from app.database import engine
 from app.errors import DomainError
@@ -14,7 +15,7 @@ from app.observability.logging import configure_logging, get_logger, trace_id_va
 from app.observability.metrics import register_pool_gauge, register_query_timing
 from app.observability.middleware import TraceMiddleware
 from app.observability.tracing import setup_tracing
-from app.services import ai_client
+from app.services import ai_client, bancs_client
 
 # El logging se configura ANTES de crear la app: cualquier línea que emitan las librerías
 # durante el arranque ya debe salir en JSON.
@@ -26,14 +27,16 @@ log = get_logger("main")
 async def lifespan(_: FastAPI):
     log.info("service_started")
     ai_client.init_client()  # cliente HTTP compartido (reutiliza conexiones hacia la IA)
+    bancs_client.init_client()  # solo lo usa la conciliación admin; NUNCA el camino de transferencias
     yield
     log.info("service_stopping")
     await ai_client.close_client()
+    await bancs_client.close_client()
     # Al apagar, cerramos el pool ordenadamente: Postgres no se queda con conexiones huérfanas.
     await engine.dispose()
 
 
-app = FastAPI(title="SmartBancs Transaction API", version="0.5.0", lifespan=lifespan)
+app = FastAPI(title="SmartBancs Transaction API", version="0.6.0", lifespan=lifespan)
 
 # Orden importa: Starlette pone el ÚLTIMO middleware añadido como el más externo. Registramos
 # TraceMiddleware primero y la instrumentación OTel después, para que OTel quede por fuera:
@@ -43,6 +46,7 @@ setup_tracing(app, engine)
 register_pool_gauge(engine)
 register_query_timing(engine)
 app.include_router(router)
+app.include_router(admin_router)
 
 
 @app.exception_handler(DomainError)

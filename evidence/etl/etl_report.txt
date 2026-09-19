@@ -1,0 +1,38 @@
+========================================================================
+REPORTE ETL  (corrida 88b791b4-838b-4ef2-8b00-64622aa036d8)
+========================================================================
+Registros leídos del CSV crudo ........ 4415
+Registros limpios (tras CLEAN) ........ 3954
+Registros en cuarentena (total) ....... 461   (10.4%)
+Registros cargados a la BD ............ 3954
+Control: leídos = limpios + cuarentena  4415 = 3954 + 461  ->  OK
+
+Cuarentena por motivo:
+     82  exact_duplicate
+     80  duplicate_business_key
+     55  negative_amount
+     51  missing_critical:customer_id
+     45  wrong_column_count
+     42  missing_critical:amount
+     40  missing_critical:date
+     19  invalid_amount
+     19  amount_exceeds_cap
+     18  invalid_date
+     10  unknown_currency
+
+Imputaciones aplicadas:
+    403  description -> ''
+    214  merchant -> 'DESCONOCIDO'
+    135  currency -> moda de la cuenta
+
+Enriquecimiento: 2410 agregados cliente-día | 835 categorías inferidas | 49 montos atípicos | 384 filas en días de alta frecuencia
+Parquet: 4 archivos, 114,848 bytes  (CSV crudo: 420,635 bytes)
+Tablas analíticas: analytics_transactions=3954  analytics_customer_daily=2410
+
+Duración por etapa:
+  extract      0.055 s
+  clean        0.217 s
+  transform    0.087 s
+  load         0.535 s
+  TOTAL        0.896 s
+========================================================================

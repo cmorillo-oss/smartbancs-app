@@ -1,6 +1,6 @@
 {
-  "global_sum_debit": "538390.00",
-  "global_sum_credit": "538390.00",
+  "global_sum_debit": "64825.00",
+  "global_sum_credit": "64825.00",
   "transactions_with_bad_entry_pairs": 0,
   "accounts_whose_balance_differs_from_ledger": 0,
   "accounts_whose_last_balance_after_differs": 0,

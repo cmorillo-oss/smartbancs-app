@@ -2,14 +2,14 @@
 
 Se ejecuta con:  python -m app.workers.outbox_worker   (servicio `outbox-worker` del compose)
 
-ES LA RED DE SEGURIDAD del patrón Outbox: si la tarea de fondo de la API no llegó a entregar un
-evento (IA caída, proceso reiniciado, mamparo lleno...), el evento sigue PENDING en la BD y este
-worker lo recoge, con reintentos y backoff. Como es un proceso separado, tiene su propio pool de
-conexiones y su propio circuit breaker: un problema aquí no afecta al camino de las transferencias.
+ES LA RED DE SEGURIDAD del patrón Outbox: cada cambio de saldo dejó sus eventos en la BD dentro de
+la misma transacción; este proceso los lleva a sus destinos con reintentos y backoff:
+  * 'ai.transaction_created'  -> servicio de IA (uno a uno, con concurrencia limitada)
+  * 'bancs.balance_updated'   -> core legado Bancs, en LOTES de hasta 100 (Fase 6)
 
-Alcance de la Fase 5: entrega los eventos 'ai.transaction_created'. El despacho por lotes de
-'bancs.balance_updated' se registra en HANDLED_EVENT_TYPES en la Fase 6 (cuando exista Bancs).
-Mientras tanto esos eventos quedan PENDING, intactos, sin consumir reintentos.
+Como es un proceso separado tiene su propio pool de conexiones y sus propios circuit breakers: un
+problema con Bancs o la IA no afecta al camino de las transferencias. Se puede escalar a N réplicas
+gracias a FOR UPDATE SKIP LOCKED.
 """
 import asyncio
 import signal
@@ -21,17 +21,21 @@ from prometheus_client import start_http_server
 from app.config import settings
 from app.database import SessionFactory, engine
 from app.observability.logging import configure_logging, get_logger, trace_id_var
-from app.observability.metrics import OUTBOX_PENDING
+from app.observability.metrics import BANCS_SYNC_BATCH_SIZE, BANCS_SYNC_DURATION, BANCS_SYNC_TOTAL, OUTBOX_PENDING
 from app.repositories import outbox_repository as outbox
-from app.services import ai_client
+from app.services import ai_client, bancs_client
 
 configure_logging()
 log = get_logger("outbox_worker")
 
-HANDLED_EVENT_TYPES = ["ai.transaction_created"]
+AI_EVENT = "ai.transaction_created"
+BANCS_EVENT = "bancs.balance_updated"
 
 
-async def _deliver(event, sem: asyncio.Semaphore) -> str:
+# --------------------------------------------------------------------------------------------
+# IA
+# --------------------------------------------------------------------------------------------
+async def _deliver_ai(event, sem: asyncio.Semaphore) -> str:
     # Un semáforo limita las entregas en paralelo dentro del lote: 100 llamadas a la IA a la vez
     # serían justo el tipo de avalancha que el circuit breaker y el mamparo existen para evitar.
     async with sem:
@@ -43,34 +47,103 @@ async def _deliver(event, sem: asyncio.Semaphore) -> str:
         )
 
 
-async def run_cycle() -> dict:
-    """Un ciclo: recuperar vencidos -> reclamar lote -> entregar -> actualizar gauge."""
-    stats = {"claimed": 0, "sent": 0, "retry": 0, "dead": 0, "released": 0, "recovered": 0}
-
+async def sync_ai() -> dict:
+    stats = {"ai_claimed": 0, "ai_sent": 0, "ai_retry": 0, "ai_dead": 0, "ai_released": 0}
+    # Con el circuito de la IA abierto NO reclamamos: reclamar y fallar consumiría reintentos de
+    # eventos sin culpa y los llevaría a DEAD durante una caída larga. Se quedan PENDING.
+    if not ai_client.breaker.would_allow():
+        log.info("ai_sync_skipped_circuit_open")
+        return stats
     async with SessionFactory() as session, session.begin():
-        stats["recovered"] = await outbox.recover_stale(session)
+        batch = await outbox.claim_batch(session, [AI_EVENT], settings.outbox_batch_size)
+    stats["ai_claimed"] = len(batch)
+    if batch:
+        sem = asyncio.Semaphore(settings.outbox_concurrency)
+        # Cada entrega corre en su propia tarea => su propio contexto (trace_id aislado por evento).
+        for r in await asyncio.gather(*(_deliver_ai(e, sem) for e in batch)):
+            stats[f"ai_{r}"] += 1
+    return stats
 
-    # Si el circuito hacia la IA está abierto NO reclamamos nada: reclamar y fallar consumiría
-    # reintentos de eventos que no tienen culpa y los llevaría a DEAD durante una caída larga.
-    # Se quedan PENDING y se entregan cuando la IA vuelva.
-    if ai_client.breaker.would_allow():
+
+# --------------------------------------------------------------------------------------------
+# BANCS: sincronización por lotes
+# --------------------------------------------------------------------------------------------
+async def sync_bancs() -> dict:
+    """Envía a Bancs los cambios de saldo pendientes AGRUPADOS en lotes de hasta `outbox_batch_size`.
+
+    POR QUÉ lotes: una petición a Bancs cuesta 200-500 ms sin importar cuántos eventos lleve. Enviar
+    100 eventos en 1 petición cuesta lo mismo que enviar 1, y le presenta a Bancs 1 petición en vez
+    de 100 (que lo saturarían). Con 10.000 TPS locales, Bancs recibe ~100 peticiones/s como mucho.
+
+    "Cada 2 s o cuando el lote se llena": el ciclo corre cada 2 s (lote parcial), y si el lote sale
+    lleno se envía otro de inmediato (hasta un tope por ciclo), sin esperar los 2 s.
+    """
+    stats = {"bancs_batches": 0, "bancs_events_sent": 0, "bancs_batches_failed": 0, "bancs_events_dead": 0}
+    for _ in range(settings.bancs_max_batches_per_cycle):
+        # Con el circuito de Bancs abierto no se reclama nada (mismo razonamiento que con la IA).
+        if not bancs_client.breaker.would_allow():
+            log.info("bancs_sync_skipped_circuit_open")
+            break
         async with SessionFactory() as session, session.begin():
-            batch = await outbox.claim_batch(session, HANDLED_EVENT_TYPES, settings.outbox_batch_size)
-        stats["claimed"] = len(batch)
-        if batch:
-            sem = asyncio.Semaphore(settings.outbox_concurrency)
-            # Cada entrega corre en su propia tarea => su propio contexto (trace_id aislado por evento).
-            results = await asyncio.gather(*(_deliver(e, sem) for e in batch))
-            for r in results:
-                stats[r] += 1
-    else:
-        log.info("outbox_cycle_skipped_circuit_open")
+            claimed = await outbox.claim_batch(session, [BANCS_EVENT], settings.outbox_batch_size)
+        if not claimed:
+            break
+
+        batch_id = uuid.uuid4()
+        ids = [e["id"] for e in claimed]
+        # trace_id del lote: un lote mezcla eventos de muchas transferencias, así que el lote tiene el
+        # suyo propio y cada evento conserva el de su transferencia dentro del cuerpo (trazabilidad ambas vías).
+        trace_id_var.set(f"bancs-batch-{str(batch_id)[:8]}")
+        events = [
+            {"sequence": e["id"], "trace_id": e["trace_id"], **e["payload"]} for e in claimed
+        ]
+        status, latency_ms, error = await bancs_client.send_batch(str(batch_id), events)
+
+        # Confirmar el resultado del lote en UNA transacción corta (sin conexión abierta durante la llamada).
+        async with SessionFactory() as session, session.begin():
+            if status == "ok":
+                await outbox.mark_sent_many(session, ids)
+                await outbox.insert_sync_log(session, batch_id=batch_id, events_count=len(ids), status="SUCCESS",
+                                             latency_ms=latency_ms, error_message=None)
+            elif status == "failed":
+                counts = await outbox.mark_failed_many(session, ids)
+                stats["bancs_events_dead"] += counts.get("DEAD", 0)
+                await outbox.insert_sync_log(session, batch_id=batch_id, events_count=len(ids), status="FAILED",
+                                             latency_ms=latency_ms, error_message=error)
+            else:  # circuit_open: no se intentó => los eventos vuelven intactos, sin gastar reintentos
+                await outbox.release_many(session, ids)
+
+        BANCS_SYNC_TOTAL.labels(status={"ok": "success", "failed": "failure", "circuit_open": "circuit_open"}[status]).inc()
+        if status == "ok":
+            BANCS_SYNC_BATCH_SIZE.observe(len(ids))
+            BANCS_SYNC_DURATION.observe(latency_ms / 1000)
+            stats["bancs_batches"] += 1
+            stats["bancs_events_sent"] += len(ids)
+            log.info("bancs_batch_sent", batch_id=str(batch_id), events=len(ids), latency_ms=latency_ms)
+        elif status == "failed":
+            stats["bancs_batches_failed"] += 1
+            log.warning("bancs_batch_failed", batch_id=str(batch_id), events=len(ids), latency_ms=latency_ms, error=error)
+            break  # Bancs está mal: no insistir con más lotes en este ciclo
+        else:
+            break
+        if len(claimed) < settings.outbox_batch_size:
+            break  # lote parcial: no hay más pendientes; el próximo ciclo (2 s) recogerá lo nuevo
+    return stats
+
+
+# --------------------------------------------------------------------------------------------
+async def run_cycle() -> dict:
+    """Un ciclo: recuperar vencidos -> (IA y Bancs EN PARALELO) -> actualizar gauge."""
+    async with SessionFactory() as session, session.begin():
+        recovered = await outbox.recover_stale(session)
+
+    # En paralelo: entregar 100 eventos a la IA tarda varios segundos; no debe retrasar la sincronización con Bancs.
+    ai_stats, bancs_stats = await asyncio.gather(sync_ai(), sync_bancs())
 
     async with SessionFactory() as session:
         pending = await outbox.count_pending(session)
     OUTBOX_PENDING.set(pending)
-    stats["pending"] = pending
-    return stats
+    return {"recovered": recovered, "pending": pending, **ai_stats, **bancs_stats}
 
 
 async def main() -> None:
@@ -82,6 +155,7 @@ async def main() -> None:
 
     start_http_server(settings.metrics_port)  # /metrics del worker, para Prometheus
     ai_client.init_client()
+    bancs_client.init_client()
     trace_id_var.set("-")
     log.info("outbox_worker_started", poll_interval_s=settings.outbox_poll_interval_s, batch=settings.outbox_batch_size)
 
@@ -89,7 +163,7 @@ async def main() -> None:
         started = time.perf_counter()
         try:
             stats = await run_cycle()
-            if stats["claimed"] or stats["recovered"]:
+            if any(stats[k] for k in ("ai_claimed", "bancs_batches", "bancs_batches_failed", "recovered")):
                 log.info("outbox_cycle", **stats)
         except Exception:  # noqa: BLE001 - un ciclo fallido (p. ej. BD reiniciándose) no mata al worker
             log.exception("outbox_cycle_failed")
@@ -102,6 +176,7 @@ async def main() -> None:
 
     log.info("outbox_worker_stopping")
     await ai_client.close_client()
+    await bancs_client.close_client()
     await engine.dispose()
 
 

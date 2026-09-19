@@ -177,3 +177,97 @@ async def latest_recommendation(session: AsyncSession, customer_id: str):
         {"c": customer_id},
     )
     return row.mappings().first()
+
+
+# ---------------------------------------------------------------------------------------------
+# Operaciones por LOTE (sincronización con Bancs): una sentencia para N eventos, no N sentencias.
+# ---------------------------------------------------------------------------------------------
+
+async def mark_sent_many(session: AsyncSession, event_ids: list[int]) -> None:
+    await session.execute(
+        text("UPDATE outbox_events SET status = 'SENT', processed_at = NOW(), next_retry_at = NULL WHERE id = ANY(:ids)"),
+        {"ids": event_ids},
+    )
+
+
+async def mark_failed_many(session: AsyncSession, event_ids: list[int]) -> dict[str, int]:
+    """Fallo de un lote: cada evento sube su contador; backoff exponencial con jitter (calculado en SQL,
+    por fila, porque cada evento lleva su propio retry_count); DEAD al agotar reintentos."""
+    rows = await session.execute(
+        text(
+            """
+            UPDATE outbox_events
+               SET retry_count = retry_count + 1,
+                   status = CASE WHEN retry_count + 1 >= :max THEN 'DEAD' ELSE 'PENDING' END,
+                   processed_at = CASE WHEN retry_count + 1 >= :max THEN NOW() ELSE NULL END,
+                   next_retry_at = CASE WHEN retry_count + 1 >= :max THEN NULL
+                                        ELSE NOW() + make_interval(secs => :base * power(2, retry_count) * (0.75 + random() * 0.5))
+                                   END
+             WHERE id = ANY(:ids)
+         RETURNING status
+            """
+        ),
+        {"ids": event_ids, "max": settings.outbox_max_retries, "base": settings.outbox_backoff_base_s},
+    )
+    counts: dict[str, int] = {}
+    for (status,) in rows:
+        counts[status] = counts.get(status, 0) + 1
+    return counts
+
+
+async def release_many(session: AsyncSession, event_ids: list[int]) -> None:
+    await session.execute(
+        text("UPDATE outbox_events SET status = 'PENDING', next_retry_at = NULL WHERE id = ANY(:ids) AND status = 'PROCESSING'"),
+        {"ids": event_ids},
+    )
+
+
+async def insert_sync_log(
+    session: AsyncSession, *, batch_id: uuid.UUID, events_count: int, status: str,
+    latency_ms: int | None, error_message: str | None,
+) -> None:
+    """Una fila por lote enviado: auditoría de la integración y base de la conciliación."""
+    await session.execute(
+        text(
+            """
+            INSERT INTO bancs_sync_log (batch_id, events_count, status, latency_ms, error_message)
+            VALUES (:b, :n, :s, :lat, :err)
+            """
+        ),
+        {"b": batch_id, "n": events_count, "s": status, "lat": latency_ms, "err": error_message},
+    )
+
+
+async def pending_bancs_by_account(session: AsyncSession) -> dict[str, int]:
+    """Cuántos cambios de saldo siguen SIN sincronizar, por cuenta. Explica por qué el saldo local
+    y el de Bancs pueden diferir legítimamente (consistencia eventual)."""
+    rows = await session.execute(
+        text(
+            """
+            SELECT payload->>'source_account' AS s, payload->>'dest_account' AS d
+              FROM outbox_events
+             WHERE event_type = 'bancs.balance_updated' AND status IN ('PENDING', 'PROCESSING')
+             LIMIT 100000
+            """
+        )
+    )
+    counts: dict[str, int] = {}
+    for r in rows:
+        for acc in (r.s, r.d):
+            counts[acc] = counts.get(acc, 0) + 1
+    return counts
+
+
+async def accounts_for_reconciliation(session: AsyncSession, limit: int, numbers: list[str] | None):
+    if numbers:
+        rows = await session.execute(
+            text("SELECT account_number, balance FROM accounts WHERE account_number = ANY(:n) ORDER BY account_number"),
+            {"n": numbers},
+        )
+    else:
+        # Las cuentas con actividad más reciente son las que más probablemente estén desincronizadas.
+        rows = await session.execute(
+            text("SELECT account_number, balance FROM accounts ORDER BY updated_at DESC, id DESC LIMIT :lim"),
+            {"lim": limit},
+        )
+    return rows.mappings().all()

@@ -1,0 +1,22 @@
+{
+  "resumen_conciliacion_inicial": {
+    "PENDING_SYNC": 2
+  },
+  "resumen_conciliacion_final": {
+    "MATCH": 2
+  },
+  "saldos_finales": [
+    {
+      "cuenta": "BS-fc30e250-00",
+      "local": "950.00",
+      "bancs": "950.00"
+    },
+    {
+      "cuenta": "BS-fc30e250-01",
+      "local": "1050.00",
+      "bancs": "1050.00"
+    }
+  ],
+  "eventos_sin_enviar": 0,
+  "lotes_exitosos_en_bancs_sync_log": 18
+}

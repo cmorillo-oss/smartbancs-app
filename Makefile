@@ -1,4 +1,4 @@
-.PHONY: up down logs test clean seed test-concurrency demo-race test-unit ai-down ai-up ai-resilience
+.PHONY: etl bancs-sync-log bancs-degradation test-integration bancs-resilience up down logs test clean seed test-concurrency demo-race test-unit ai-down ai-up ai-resilience
 
 # Levanta todo en segundo plano y reconstruye la imagen si cambió el código.
 up:
@@ -12,7 +12,7 @@ logs:
 	docker compose logs -f --tail=100
 
 # Todos los tests (por ahora: la suite de concurrencia).
-test: test-unit test-concurrency
+test: test-unit test-concurrency test-integration
 
 # Prueba de race conditions (Fase 4). Levanta Postgres + API si hace falta, corre pytest en un
 # contenedor y guarda la salida como evidencia. `-T` evita pedir TTY (funciona también en CI).
@@ -49,3 +49,26 @@ ai-up:
 # PRUEBA DECISIVA de la Fase 5: p95 de transferencias con la IA encendida, apagada y colgada.
 ai-resilience:
 	bash scripts/ai_resilience_demo.sh 2>&1 | tee evidence/ai-resilience/output.txt
+
+# Pipeline ETL (Fase 6): genera el CSV sucio (si no existe), limpia, transforma y carga (Parquet + BD).
+etl:
+	docker compose up -d postgres
+	docker compose --profile etl run --rm --build etl
+
+# Ultimos lotes enviados a Bancs.
+bancs-sync-log:
+	docker compose exec -T postgres psql -U smartbancs -d smartbancs -c "SELECT batch_id, events_count, status, latency_ms, created_at FROM bancs_sync_log ORDER BY id DESC LIMIT 10"
+
+# Bancs bajo carga: latencia y 503 al subir la concurrencia; lotes vs peticiones sueltas.
+bancs-degradation:
+	docker compose up -d bancs-mock
+	docker compose --profile test run --rm -T tests python integration/bancs_degradation.py
+
+# Integracion de extremo a extremo (requiere el stack completo: `make up`).
+test-integration:
+	docker compose up -d --build
+	docker compose --profile test run --rm -T tests pytest integration -v 2>&1 | tee evidence/test-data/test_integration_output.txt
+
+# Bancs se cae y vuelve: las transferencias siguen y el atraso se sincroniza solo.
+bancs-resilience:
+	bash scripts/bancs_resilience_demo.sh

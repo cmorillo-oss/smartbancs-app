@@ -1,0 +1,29 @@
+=== Demo: caída del core legado Bancs (2026-09-19T02:28:47Z) ===
+
+1) Estado inicial (Bancs encendido):
+   5/5 transferencias OK (201)
+   cambios pendientes de sincronizar: 0
+
+2) Apagamos Bancs (docker compose stop bancs-mock) y hacemos 40 transferencias:
+   40/40 transferencias OK (201)   <- la API NO depende de Bancs
+   cambios acumulados en el outbox: 40
+   smartbancs_bancs_circuit_breaker_state 1.0   (0=CLOSED 1=OPEN)
+   últimos lotes en bancs_sync_log:
+     FAILED|8|ConnectError: [Errno -2] Name or service not known
+     FAILED|30|ConnectError: [Errno -2] Name or service not known
+     FAILED|10|ConnectError: [Errno -2] Name or service not known
+   eventos en DEAD (dead letter): 0
+
+3) Encendemos Bancs otra vez y esperamos a que el worker envíe el atraso:
+   t+4s pendientes: 40
+   t+8s pendientes: 40
+   t+12s pendientes: 40
+   t+16s pendientes: 40
+   t+20s pendientes: 40
+   t+24s pendientes: 0
+   smartbancs_bancs_circuit_breaker_state 0.0
+
+4) Conciliación final (saldo local vs Bancs) de las cuentas usadas:
+   resumen: {'MATCH': 2}
+   ACC-000003 local 14955.00 bancs 14955.00 MATCH
+   ACC-000004 local 20045.00 bancs 20045.00 MATCH
